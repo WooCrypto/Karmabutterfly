@@ -561,6 +561,16 @@ export default function ProfileOverlay() {
                   )}
                 </div>
 
+                {/* NFT Hold & Wallet Scan Note */}
+                <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-3 text-[11px] text-slate-300 leading-relaxed font-sans space-y-1">
+                  <div className="flex items-center gap-1.5 text-amber-400 font-extrabold uppercase font-mono tracking-wider">
+                    <span>⚠️ ON-CHAIN VERIFICATION STATEMENT</span>
+                  </div>
+                  <p>
+                    Normally, this utility dynamically scans connected wallets to verify specific **Karma Butterfly NFT ownership**. Because we are in test/sandbox mode, full access is open to preview and download customized designs on any uploaded custom image or preset.
+                  </p>
+                </div>
+
                 {isConnected ? (
                   <div className="space-y-3 bg-black/40 p-4 rounded-xl border border-white/5">
                     <div className="flex justify-between items-start">

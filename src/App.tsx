@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import SvgButterfly from './components/SvgButterfly';
 import SwarmTerminal from './components/SwarmTerminal';
+import FAQ from './components/FAQ';
 import { ArrowDown, Flame, ShieldAlert, Sparkles, Network, BookOpen, X, Heart, ExternalLink, Zap, Globe, Twitter, Link, Check, Share2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -85,6 +86,19 @@ export default function App() {
     if (analyzerRef.current) {
       analyzerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+  };
+
+  const scrollToOverlay = () => {
+    window.location.hash = '#profile-overlay';
+    if (analyzerRef.current) {
+      analyzerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    setTimeout(() => {
+      const el = document.getElementById('profile-overlay');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 180);
   };
 
   const narrativePoints = [
@@ -184,12 +198,20 @@ export default function App() {
               </p>
             </div>
 
-            <div className="flex flex-wrap sm:flex-nowrap items-center gap-4 border-t border-black/10 pt-6">
+            <div className="flex flex-wrap items-center gap-3 border-t border-black/10 pt-6">
               <button
                 onClick={scrollToAnalyzer}
                 className="px-6 py-3 bg-black text-white hover:bg-neutral-900 rounded-full font-sans font-bold text-xs tracking-wider uppercase transition shadow-md active:scale-97 cursor-pointer text-center whitespace-nowrap"
               >
                 Scan Your Alignment
+              </button>
+
+              <button
+                onClick={scrollToOverlay}
+                className="px-6 py-3 bg-neutral-950 text-amber-400 hover:text-white hover:bg-black rounded-full font-sans font-black text-xs tracking-wider uppercase transition-all shadow-md active:scale-97 cursor-pointer text-center whitespace-nowrap inline-flex items-center gap-1.5 border border-neutral-900"
+              >
+                <span>PFP Overlay</span>
+                <span className="text-xs">📸</span>
               </button>
               
               <a
@@ -202,7 +224,7 @@ export default function App() {
                 <span className="text-xs">↗</span>
               </a>
 
-              <p className="hidden md:block text-xs italic font-bold text-black/80 font-mono leading-tight">
+              <p className="hidden xl:block text-xs italic font-bold text-black/80 font-mono leading-tight">
                 starts with karma.
               </p>
             </div>
@@ -310,9 +332,12 @@ export default function App() {
       </header>
 
       {/* Main Consolidated SwarmTerminal Dashboard */}
-      <div ref={analyzerRef}>
+      <div id="analyzer" ref={analyzerRef}>
         <SwarmTerminal isLightMode={isLightMode} />
       </div>
+
+      {/* Standalone FAQ Accordion Section */}
+      <FAQ />
 
       {/* Bottom Final CTA Footer Block */}
       <footer className="bg-[#050505] border-t border-white/10 pt-16 pb-12 relative overflow-hidden">

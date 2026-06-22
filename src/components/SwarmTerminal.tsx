@@ -56,12 +56,16 @@ export default function SwarmTerminal({ isLightMode }: SwarmTerminalProps) {
         setActiveTab('guardians');
       }
 
-      // Smooth scroll to terminal header
+      // Smooth scroll to direct section ID if exists, otherwise fallback to terminal header
       setTimeout(() => {
-        if (terminalRef.current) {
+        const hashTargetId = window.location.hash.slice(1);
+        const element = hashTargetId ? document.getElementById(hashTargetId) : null;
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else if (terminalRef.current) {
           terminalRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-      }, 100);
+      }, 150);
     };
 
     // Listen to why-karma-view custom dispatchers
@@ -75,10 +79,14 @@ export default function SwarmTerminal({ isLightMode }: SwarmTerminalProps) {
       }
       
       setTimeout(() => {
-        if (terminalRef.current) {
+        const hashTargetId = window.location.hash.slice(1);
+        const element = hashTargetId ? document.getElementById(hashTargetId) : null;
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else if (terminalRef.current) {
           terminalRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-      }, 100);
+      }, 150);
     };
 
     window.addEventListener('hashchange', handleHashAndEvents);
@@ -198,7 +206,7 @@ export default function SwarmTerminal({ isLightMode }: SwarmTerminalProps) {
           <div className="bg-neutral-900/40 border border-white/5 rounded-xl px-4 py-2.5 shrink-0 flex items-center gap-2.5">
             <Award className="w-4 h-4 text-[#F59E0B]" />
             <div>
-              <p className="text-slate-500 uppercase leading-none font-bold">COLLECTION RATE</p>
+              <p className="text-slate-500 uppercase leading-none font-bold">GUARDS</p>
               <p className="text-[#F59E0B] font-extrabold mt-0.5">999 UNIQUE BVERS</p>
             </div>
           </div>
@@ -440,8 +448,8 @@ export default function SwarmTerminal({ isLightMode }: SwarmTerminalProps) {
 
                 <TeamBios />
 
-                <div id="faq" className="pt-6">
-                  <FAQ />
+                <div id="terminal-faq" className="pt-6 border-t border-white/5">
+                  <FAQ isNested />
                 </div>
               </div>
             )}

@@ -66,7 +66,7 @@ export default function Navbar({ onScanClick, isLightMode, onThemeToggle }: Navb
     { label: 'Registry', href: '#registry' },
     { label: 'PFP Overlay', href: '#profile-overlay' },
     { label: 'Treasury', href: '#treasury' },
-    { label: 'Karma Games 🎮', href: 'https://ai.studio/apps/c9570cb3-7779-4863-ac57-0047ef654b4a?fullscreenApplet=true', external: true },
+    { label: 'Karma Gamez 🎮', href: 'https://karmagamez.xyz', external: true },
     { label: 'Utility', href: '#utility' },
   ];
 
