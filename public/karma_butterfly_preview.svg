@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" style="background:#020204; font-family:'Inter', system-ui, sans-serif; overflow:hidden;">
+  <defs>
+    <!-- Background glow gradients -->
+    <radialGradient id="glow-amber" cx="40%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="#F59E0B" stop-opacity="0.18" />
+      <stop offset="100%" stop-color="#020204" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="glow-purple" cx="60%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="#A855F7" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#020204" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Butterfly Wing Gradients -->
+    <linearGradient id="left-wing-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B" />
+      <stop offset="60%" stop-color="#D97706" />
+      <stop offset="100%" stop-color="#A855F7" stop-opacity="0.4" />
+    </linearGradient>
+    <linearGradient id="right-wing-grad" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#A855F7" />
+      <stop offset="60%" stop-color="#8B5CF6" />
+      <stop offset="100%" stop-color="#F59E0B" stop-opacity="0.4" />
+    </linearGradient>
+
+    <!-- Metallic body gradient -->
+    <linearGradient id="body-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1E293B" />
+      <stop offset="50%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#1E293B" />
+    </linearGradient>
+
+    <!-- Hexagon or Tech Pattern -->
+    <pattern id="grid-pattern" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#F59E0B" stroke-opacity="0.04" stroke-width="1" />
+      <circle cx="0" cy="0" r="1.5" fill="#F59E0B" fill-opacity="0.15" />
+    </pattern>
+
+    <filter id="beauty-glow">
+      <feGaussianBlur stdDeviation="15" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Ambient Under-glows -->
+  <rect width="1200" height="630" fill="url(#glow-amber)" />
+  <rect width="1200" height="630" fill="url(#glow-purple)" />
+
+  <!-- Tech Grid Overlay -->
+  <rect width="1200" height="630" fill="url(#grid-pattern)" />
+
+  <!-- Decorative Tech Circles in background -->
+  <circle cx="600" cy="315" r="320" fill="none" stroke="#F59E0B" stroke-opacity="0.03" stroke-width="2" />
+  <circle cx="600" cy="315" r="240" fill="none" stroke="#F59E0B" stroke-opacity="0.05" stroke-width="1" stroke-dasharray="10 15" />
+  <circle cx="600" cy="315" r="160" fill="none" stroke="#A855F7" stroke-opacity="0.04" stroke-width="1" />
+
+  <!-- Outer Framing Corners -->
+  <path d="M 40 60 L 40 40 L 60 40" fill="none" stroke="#F59E0B" stroke-opacity="0.3" stroke-width="2" />
+  <path d="M 1160 60 L 1160 40 L 1140 40" fill="none" stroke="#F59E0B" stroke-opacity="0.3" stroke-width="2" />
+  <path d="M 40 570 L 40 590 L 60 590" fill="none" stroke="#F59E0B" stroke-opacity="0.3" stroke-width="2" />
+  <path d="M 1160 570 L 1160 590 L 1140 590" fill="none" stroke="#F59E0B" stroke-opacity="0.3" stroke-width="2" />
+
+  <!-- TOP BRANDING OVERLAYS -->
+  <text x="600" y="75" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="900" fill="#F59E0B" letter-spacing="8" text-anchor="middle" opacity="0.6">
+    VERIFIABLE CREDITENTIAL DECENTRALIZED PROTOCOL
+  </text>
+
+  <!-- THE GLOWING BUTTERFLY GRAPHIC (CENTERED) -->
+  <g transform="translate(600, 290) scale(2.2)" filter="url(#beauty-glow)" style="overflow:visible;">
+    <!-- Wings Underglow Shadows for depth -->
+    <path d="M 0,-10 Q -45,-65 -85,-40 Q -105,-15 -65,15 Q -15,5 0,10 Z" fill="#F59E0B" opacity="0.1" />
+    <path d="M 0,-10 Q 45,-65 85,-40 Q 105,-15 65,15 Q 15,5 0,10 Z" fill="#A855F7" opacity="0.1" />
+
+    <!-- Upper Wings -->
+    <path d="M 0,-10 Q -45,-65 -85,-40 Q -105,-15 -65,15 Q -15,5 0,10 Z" fill="url(#left-wing-grad)" stroke="#F59E0B" stroke-width="1.5" stroke-opacity="0.8" />
+    <path d="M 0,-10 Q 45,-65 85,-40 Q 105,-15 65,15 Q 15,5 0,10 Z" fill="url(#right-wing-grad)" stroke="#A855F7" stroke-width="1.5" stroke-opacity="0.8" />
+
+    <!-- Upper Wing Accents / Decals -->
+    <path d="M -20,-20 Q -50,-50 -75,-35 Q -65,-15 -35,-5 Z" fill="none" stroke="#ffffff" stroke-width="1" stroke-opacity="0.35" />
+    <path d="M 20,-20 Q 50,-50 75,-35 Q 65,-15 35,-5 Z" fill="none" stroke="#ffffff" stroke-width="1" stroke-opacity="0.35" />
+
+    <!-- Lower Wings -->
+    <path d="M 0,10 Q -45,15 -55,42 Q -45,62 -25,52 Q -10,42 0,10 Z" fill="url(#left-wing-grad)" stroke="#F59E0B" stroke-width="1.2" stroke-opacity="0.6" />
+    <path d="M 0,10 Q 45,15 55,42 Q 45,62 25,52 Q 10,42 0,10 Z" fill="url(#right-wing-grad)" stroke="#A855F7" stroke-width="1.2" stroke-opacity="0.6" />
+
+    <!-- Antennas -->
+    <path d="M0,-24 Q -12,-45 -22,-50" fill="none" stroke="#F59E0B" stroke-width="1.5" stroke-linecap="round" />
+    <path d="M0,-24 Q 12,-45 22,-50" fill="none" stroke="#A855F7" stroke-width="1.5" stroke-linecap="round" />
+    <circle cx="-22" cy="-50" r="2.5" fill="#F59E0B" />
+    <circle cx="22" cy="-50" r="2.5" fill="#A855F7" />
+
+    <!-- Body Core -->
+    <rect x="-3" y="-28" width="6" height="56" rx="3" fill="url(#body-grad)" stroke="#020204" stroke-width="1" />
+    <circle cx="0" cy="-24" r="5" fill="#F59E0B" />
+    <circle cx="0" cy="-24" r="2" fill="#FFFFFF" />
+
+    <!-- Glowing Node Connectors on the butterfly to look techy -->
+    <line x1="-85" y1="-40" x2="-65" y2="15" stroke="#FFFFFF" stroke-opacity="0.2" stroke-width="1" />
+    <line x1="85" y1="-40" x2="65" y2="15" stroke="#FFFFFF" stroke-opacity="0.2" stroke-width="1" />
+    <circle cx="-85" cy="-40" r="4" fill="#FFFFFF" opacity="0.6" />
+    <circle cx="85" cy="-40" r="4" fill="#FFFFFF" opacity="0.6" />
+    <circle cx="-65" cy="15" r="4" fill="#F59E0B" opacity="0.7" />
+    <circle cx="65" cy="15" r="4" fill="#A855F7" opacity="0.7" />
+  </g>
+
+  <!-- MIDDLE WORKSPACE INFO / MAIN TITLE -->
+  <text x="600" y="475" font-family="'Inter', sans-serif" font-size="44" font-weight="950" fill="#FFFFFF" letter-spacing="-1" text-anchor="middle">
+    KARMA BUTTERFLIES
+  </text>
+  <text x="600" y="515" font-family="'JetBrains Mono', monospace" font-size="14" font-weight="700" fill="#F59E0B" letter-spacing="4" text-anchor="middle">
+    REPUTATION CREDENTIALS • TRUST DECODER
+  </text>
+
+  <!-- FOOTER BLOCKCHAINS (SUPPORTED NETWORKS) -->
+  <g transform="translate(600, 560)">
+    <rect x="-380" y="0" width="760" height="32" rx="16" fill="#0c0a09" stroke="#ffffff" stroke-opacity="0.06" stroke-width="1" />
+    <text x="0" y="20" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="800" fill="#78716c" letter-spacing="4" text-anchor="middle">
+      <tspan fill="#F59E0B">SOLANA</tspan>  //  <tspan fill="#34D399">HEDERA</tspan>  //  <tspan fill="#38BDF8">ETHEREUM</tspan>  //  <tspan fill="#FBBF24">BSC</tspan>  //  <tspan fill="#60A5FA">BASE CHAIN</tspan>
+    </text>
+  </g>
+</svg>
