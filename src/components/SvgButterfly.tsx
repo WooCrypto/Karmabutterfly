@@ -101,101 +101,107 @@ export default function SvgButterfly({
   const antennaR = "M100 70 Q 125 40 135 30 Q 140 25 145 25";
 
   if (evolved) {
-    // Evolved wing shape variables
-    const evW1 = 80 - (h % 8);     // 72 to 80
-    const evW2 = 55 - (h % 10);    // 45 to 55
-    const evW3 = 25 - (h % 12);    // 13 to 25
-    const evW4 = 10 - (h % 6);     // 4 to 10
-    
-    const leftEvolvedWingPath = `M 100 100 L ${evW1} ${50 + (h % 4)} C ${evW2} 25, ${evW3} ${evW4}, 12 40 C 2 ${52 + (h % 5)}, 2 68, 12 ${78 - (h % 4)} L 22 83 C 8 93, 6 108, 22 116 L 28 119 C 18 134, 23 152, 40 160 C ${58 + (h % 5)} 168, 78 150, 100 100 Z`;
-    
-    const rightEvolvedWingPath = `M 100 100 L ${200 - evW1} ${50 + (h % 4)} C ${200 - evW2} 25, ${200 - evW3} ${evW4}, 188 40 C 198 ${52 + (h % 5)}, 198 68, 188 ${78 - (h % 4)} L 178 83 C 192 93, 194 108, 178 116 L 172 119 C 182 134, 177 152, 160 160 C ${200 - (58 + (h % 5))} 168, 122 150, 100 100 Z`;
-
-    const cellY1 = 75 + (h % 4);
-    const cellY2 = 108 - (h % 5);
-    const cellX1 = 45 - (h % 6);
-    const cellX2 = 42 + (h % 6);
-
-    const leftCell1 = `M 94 92 C 80 ${cellY1}, 65 65, ${cellX1} 60 C 35 68, 42 85, 75 95 Z`;
-    const leftCell2 = `M 85 105 C 72 ${cellY2}, 60 115, ${cellX2} 122 C 45 132, 58 138, 78 120 Z`;
-
-    const rightCell1 = `M 106 92 C 120 ${cellY1}, 135 65, ${200 - cellX1} 60 C 165 68, 158 85, 125 95 Z`;
-    const rightCell2 = `M 115 105 C 128 ${cellY2}, 140 115, ${200 - cellX2} 122 C 155 132, 142 138, 122 120 Z`;
+    // Evolved state: High-fidelity majestic Gothic Dragon Butterfly (matching the user's mockup)
+    const h = hashString(seed);
+    const rotationDeg = (h % 8) * 45;
 
     return (
       <div
         className={`relative select-none flex items-center justify-center ${className}`}
         style={{ width: size, height: size }}
       >
-        {/* Soft backdrop glow customized to the butterfly's primary color */}
+        {/* Deep background ambient neon glow */}
         <div
-          className="absolute inset-4 rounded-full bg-radial opacity-30 blur-2xl transition-all duration-700 pointer-events-none"
+          className="absolute inset-4 rounded-full bg-radial opacity-35 blur-3xl pointer-events-none transition-all duration-700"
           style={{
-            background: `radial-gradient(circle, ${colors.primary} 0%, rgba(124, 58, 237, 0.15) 60%, transparent 100%)`
+            background: `radial-gradient(circle, ${colors.primary} 0%, rgba(139, 92, 246, 0.2) 50%, rgba(244, 63, 94, 0.1) 80%, transparent 100%)`
           }}
         />
 
         <svg
           viewBox="0 0 200 200"
           className="w-full h-full overflow-visible"
-          style={{ filter: colors.glow }}
+          style={{ filter: `drop-shadow(0 0 16px ${colors.primary}bc) drop-shadow(0 0 28px rgba(232, 121, 249, 0.35))` }}
         >
           <defs>
+            {/* Wing Gradients */}
             <linearGradient id={`evolvedWingGrad-${seed}`} x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor={colors.tertiary || "#831843"} /> {/* rich tertiary */}
-              <stop offset="35%" stopColor={colors.secondary} /> {/* secondary */}
-              <stop offset="70%" stopColor={colors.primary} /> {/* primary */}
-              <stop offset="100%" stopColor="#ffffff" stopOpacity={0.85} /> {/* white shine */}
+              <stop offset="0%" stopColor="#2e1065" /> {/* Purple-950 */}
+              <stop offset="35%" stopColor={colors.secondary} /> {/* Secondary color */}
+              <stop offset="65%" stopColor={colors.primary} /> {/* Primary glowing color */}
+              <stop offset="100%" stopColor="#f472b6" /> {/* Hot pink edge alignment */}
             </linearGradient>
 
-            <linearGradient id={`wingGlowCell-${seed}`} x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#ffffff" stopOpacity={0.9} />
-              <stop offset="50%" stopColor={colors.primary} stopOpacity={0.4} />
-              <stop offset="100%" stopColor={colors.secondary} stopOpacity={0.05} />
+            <linearGradient id={`wingVeinGrad-${seed}`} x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#ffffff" stopOpacity={0.8} />
+              <stop offset="50%" stopColor="#ec4899" stopOpacity={0.4} />
+              <stop offset="100%" stopColor="#1e1b4b" stopOpacity={0.2} />
             </linearGradient>
 
             <radialGradient id={`evolvedBodyGrad-${seed}`} cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor={colors.secondary} stopOpacity={0.5} />
-              <stop offset="70%" stopColor="#091325" />
-              <stop offset="100%" stopColor="#020617" />
+              <stop offset="0%" stopColor={colors.primary} stopOpacity={0.7} />
+              <stop offset="45%" stopColor="#1e1b4b" />
+              <stop offset="100%" stopColor="#020205" />
             </radialGradient>
+
+            <filter id="neon-glow-filter">
+              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
           </defs>
 
-          {/* Radar scope circular grid - rotated deterministically */}
-          <g opacity="0.25" stroke={colors.primary} strokeWidth="0.5" fill="none" transform={`rotate(${(h % 8) * 45}, 100, 100)`}>
-            <circle cx="100" cy="100" r="75" strokeDasharray="3 3" />
-            <circle cx="100" cy="100" r="55" />
-            <circle cx="100" cy="100" r="35" strokeDasharray="1.5 1.5" />
-            <line x1="100" y1="10" x2="100" y2="190" strokeWidth="0.25" />
-            <line x1="10" y1="100" x2="190" y2="100" strokeWidth="0.25" />
+          {/* BACKPLATE: Detailed Radar scope / Sacred geometry grid aligning with the screenshot */}
+          <g opacity="0.3" stroke="#a855f7" strokeWidth="0.5" fill="none">
+            {/* Concentric rings */}
+            <circle cx="100" cy="100" r="88" strokeDasharray="1 3" strokeOpacity="0.5" />
+            <circle cx="100" cy="100" r="76" strokeWidth="0.25" />
+            <circle cx="100" cy="100" r="62" strokeDasharray="5 5" />
+            <circle cx="100" cy="100" r="48" strokeWidth="0.75" strokeOpacity="0.8" />
+            <circle cx="100" cy="100" r="32" strokeDasharray="2 2" />
+
+            {/* Crossed ticks & diagonal lines */}
+            <line x1="100" y1="5" x2="100" y2="195" strokeWidth="0.35" />
+            <line x1="5" y1="100" x2="195" y2="100" strokeWidth="0.35" />
+            <line x1="33" y1="33" x2="167" y2="167" strokeWidth="0.2" strokeDasharray="2 4" />
+            <line x1="167" y1="33" x2="33" y2="167" strokeWidth="0.2" strokeDasharray="2 4" />
+
+            {/* Outer coordinate notches */}
+            <path d="M 100 8 L 96 12 M 100 8 L 104 12" strokeWidth="0.5" />
+            <path d="M 100 192 L 96 188 M 100 192 L 104 188" strokeWidth="0.5" />
+            <path d="M 8 100 L 12 96 M 8 100 L 12 104" strokeWidth="0.5" />
+            <path d="M 192 100 L 188 96 M 192 100 L 188 104" strokeWidth="0.5" />
           </g>
 
-          {/* Outer glowing dust cells */}
+          {/* Starry dust glow sparks */}
           <g className="animate-pulse">
-            <circle cx={40 + (h % 10)} cy={45 + (h % 10)} r="1.5" fill={colors.primary} opacity="0.6" />
-            <circle cx={160 - (h % 10)} cy={45 + (h % 10)} r="1.5" fill={colors.primary} opacity="0.6" />
-            <circle cx={30 + (h % 12)} cy={110 + (h % 15)} r="1" fill={colors.secondary} opacity="0.5" />
-            <circle cx={170 - (h % 12)} cy={110 + (h % 15)} r="1" fill={colors.secondary} opacity="0.5" />
-            <circle cx="20" cy="80" r="2.2" fill={colors.primary} opacity="0.45" className="animate-ping" style={{ animationDelay: '0.4s' }} />
-            <circle cx="180" cy="80" r="2.2" fill={colors.primary} opacity="0.45" className="animate-ping" style={{ animationDelay: '0.8s' }} />
+            <circle cx="28" cy="48" r="1.5" fill="#f472b6" opacity="0.8" />
+            <circle cx="172" cy="48" r="1.5" fill="#a855f7" opacity="0.8" />
+            <circle cx="34" cy="135" r="1" fill="#ec4899" opacity="0.5" />
+            <circle cx="166" cy="135" r="1" fill="#38bdf8" opacity="0.5" />
+            <polygon points="100,22 101.5,25 104.5,25 102,27 103,30 100,28.5 97,30 98,27 95.5,25 98.5,25" fill="#f472b6" opacity="0.7" />
           </g>
 
-          {/* Curving dragon horns with procedural skew */}
-          <g stroke={colors.primary} strokeWidth="1" fill="#030712" opacity="0.95">
-            {/* left horn */}
-            <path d={`M 96 55 C 93 42, ${85 - (h % 4)} 30, ${78 - (h % 4)} 24 C 84 34, 91 44, 95 49 Z`} fill={`url(#evolvedBodyGrad-${seed})`} />
-            <path d={`M 93 40 C 90 35, ${84 - (h % 4)} 28, ${80 - (h % 4)} 25 C 84 30, 88 35, 91 38 Z`} fill={colors.primary} opacity="0.45" />
-            {/* right horn */}
-            <path d={`M 104 55 C 107 42, ${115 + (h % 4)} 30, ${122 + (h % 4)} 24 C 116 34, 109 44, 105 49 Z`} fill={`url(#evolvedBodyGrad-${seed})`} />
-            <path d={`M 107 40 C 110 35, ${116 + (h % 4)} 28, ${120 + (h % 4)} 25 C 116 30, 112 35, 109 38 Z`} fill={colors.primary} opacity="0.45" />
+          {/* DRAGON HORNS (Majestic, curving upward with spikes) */}
+          <g fill="#020205" stroke="#ec4899" strokeWidth="1" strokeLinejoin="miter">
+            {/* Left Horn */}
+            <path d="M 94 65 Q 88 40 76 22 Q 88 32 91 46 Q 84 38 80 34 Q 86 42 88 48 Q 91 52 92 60" />
+            {/* Right Horn */}
+            <path d="M 106 65 Q 112 40 124 22 Q 112 32 109 46 Q 116 38 120 34 Q 114 42 112 48 Q 109 52 108 60" />
+
+            {/* Horn inner glowing core */}
+            <path d="M 92 61 Q 87 42 78 25" fill="none" stroke="#f472b6" strokeWidth="0.75" />
+            <path d="M 108 61 Q 113 42 122 25" fill="none" stroke="#f472b6" strokeWidth="0.75" />
           </g>
 
-          {/* Left Wing Group (Spiky edge nodes) */}
+          {/* LEFT WING (Intricate Jagged Dragon/Bat scale-webbed wing) */}
           {flappingSpeed !== 'none' ? (
             <motion.g
               animate={{
-                scaleX: [1, 0.18, 1],
-                skewY: [0, -3.5, 0],
+                scaleX: [1, 0.22, 1],
+                skewY: [0, -4, 0],
               }}
               transition={{
                 repeat: Infinity,
@@ -204,61 +210,66 @@ export default function SvgButterfly({
               }}
               style={{ originX: '100px', originY: '100px' }}
             >
-              {/* Outer spiky shape (Left) */}
+              {/* Left Main Wing Body */}
               <path
-                d={leftEvolvedWingPath}
+                d="M 100 80 Q 75 42 42 32 C 28 35 12 45 15 62 C 5 70 2 82 8 94 C 18 108 8 126 18 138 C 25 145 38 142 48 132 C 58 122 75 110 100 100 Z"
                 fill={`url(#evolvedWingGrad-${seed})`}
-                stroke={colors.primary}
-                strokeWidth="1.25"
+                stroke="#ec4899"
+                strokeWidth="1.5"
                 opacity="0.95"
               />
-              {/* Glowing wing cell nodes */}
+
+              {/* Internal glowing fuchsia cell patterns/veins */}
               <path
-                d={leftCell1}
-                fill={`url(#wingGlowCell-${seed})`}
-                stroke={colors.primary}
-                strokeWidth="1"
-                opacity="0.75"
+                d="M 98 84 C 82 72 65 52 48 45 C 38 52 28 62 30 75 Z"
+                fill="url(#wingVeinGrad-${seed})"
+                opacity="0.65"
               />
               <path
-                d={leftCell2}
-                fill={`url(#wingGlowCell-${seed})`}
-                stroke={colors.secondary}
-                strokeWidth="0.75"
-                opacity="0.6"
+                d="M 96 92 C 85 92 68 85 52 78 C 38 78 24 88 22 102 C 32 110 48 102 78 95 Z"
+                fill="url(#wingVeinGrad-${seed})"
+                opacity="0.55"
+              />
+              <path
+                d="M 94 98 C 82 108 68 125 52 128 C 38 128 32 118 35 108 C 48 105 68 102 90 98 Z"
+                fill="url(#wingVeinGrad-${seed})"
+                opacity="0.5"
               />
 
-              {/* Hand-drawn spiky ridges */}
-              <path d={`M 80 50 L ${63 - (h % 4)} ${20 + (h % 3)} L 58 35`} fill="none" stroke={colors.primary} strokeWidth="1.5" strokeLinecap="round" />
-              <path d={`M 58 40 L ${38 - (h % 3)} ${10 + (h % 4)} L 35 22`} fill="none" stroke={colors.primary} strokeWidth="1.5" strokeLinecap="round" />
-              <path d={`M 42 105 L ${12 - (h % 3)} ${95 + (h % 3)} L 22 102`} fill="none" stroke={colors.primary} strokeWidth="1.25" strokeLinecap="round" />
-              <path d={`M 52 125 L ${15 - (h % 4)} ${135 + (h % 3)} L 25 140`} fill="none" stroke={colors.primary} strokeWidth="1.25" strokeLinecap="round" />
+              {/* Sharp dragon spikes / claw tips */}
+              <path d="M 42 32 L 35 22 L 38 34" fill="#020205" stroke="#f472b6" strokeWidth="1" />
+              <path d="M 15 62 L 5 56 L 10 65" fill="#020205" stroke="#f472b6" strokeWidth="1" />
+              <path d="M 8 94 L -2 95 L 4 100" fill="#020205" stroke="#f472b6" strokeWidth="1" />
+              <path d="M 18 138 L 12 148 L 22 142" fill="#020205" stroke="#f472b6" strokeWidth="1" />
+
+              {/* High-contrast webbed structural lines */}
+              <path d="M 100 80 Q 72 65 42 32 M 100 80 Q 64 80 8 94 M 100 80 Q 68 102 18 138" fill="none" stroke="#020205" strokeWidth="1.5" opacity="0.8" />
+              <path d="M 42 32 C 30 48 15 62 15 62 C 12 78 8 94 8 94" fill="none" stroke="#f472b6" strokeWidth="0.75" strokeDasharray="3 2" />
             </motion.g>
           ) : (
             <g>
               <path
-                d={leftEvolvedWingPath}
+                d="M 100 80 Q 75 42 42 32 C 28 35 12 45 15 62 C 5 70 2 82 8 94 C 18 108 8 126 18 138 C 25 145 38 142 48 132 C 58 122 75 110 100 100 Z"
                 fill={`url(#evolvedWingGrad-${seed})`}
-                stroke={colors.primary}
-                strokeWidth="1.25"
+                stroke="#ec4899"
+                strokeWidth="1.5"
                 opacity="0.95"
               />
               <path
-                d={leftCell1}
-                fill={`url(#wingGlowCell-${seed})`}
-                stroke={colors.primary}
-                strokeWidth="1"
-                opacity="0.7"
+                d="M 98 84 C 82 72 65 52 48 45 C 38 52 28 62 30 75 Z"
+                fill="url(#wingVeinGrad-${seed})"
+                opacity="0.65"
               />
+              <path d="M 100 80 Q 72 65 42 32 M 100 80 Q 64 80 8 94 M 100 80 Q 68 102 18 138" fill="none" stroke="#020205" strokeWidth="1.5" opacity="0.8" />
             </g>
           )}
 
-          {/* Right Wing Group (Spiky edge nodes) */}
+          {/* RIGHT WING (Intricate Jagged Dragon/Bat scale-webbed wing) */}
           {flappingSpeed !== 'none' ? (
             <motion.g
               animate={{
-                scaleX: [1, 0.18, 1],
-                skewY: [0, 3.5, 0],
+                scaleX: [1, 0.22, 1],
+                skewY: [0, 4, 0],
               }}
               transition={{
                 repeat: Infinity,
@@ -267,91 +278,118 @@ export default function SvgButterfly({
               }}
               style={{ originX: '100px', originY: '100px' }}
             >
-              {/* Outer spiky shape (Right) */}
+              {/* Right Main Wing Body */}
               <path
-                d={rightEvolvedWingPath}
+                d="M 100 80 Q 125 42 158 32 C 172 35 188 45 185 62 C 195 70 198 82 192 94 C 182 108 192 126 182 138 C 175 145 162 142 152 132 C 142 122 125 110 100 100 Z"
                 fill={`url(#evolvedWingGrad-${seed})`}
-                stroke={colors.primary}
-                strokeWidth="1.25"
+                stroke="#ec4899"
+                strokeWidth="1.5"
                 opacity="0.95"
               />
-              {/* Glowing wing cell nodes */}
+
+              {/* Internal glowing fuchsia cell patterns/veins */}
               <path
-                d={rightCell1}
-                fill={`url(#wingGlowCell-${seed})`}
-                stroke={colors.primary}
-                strokeWidth="1"
-                opacity="0.75"
+                d="M 102 84 C 118 72 135 52 152 45 C 162 52 172 62 170 75 Z"
+                fill="url(#wingVeinGrad-${seed})"
+                opacity="0.65"
               />
               <path
-                d={rightCell2}
-                fill={`url(#wingGlowCell-${seed})`}
-                stroke={colors.secondary}
-                strokeWidth="0.75"
-                opacity="0.6"
+                d="M 104 92 C 115 92 132 85 148 78 C 162 78 176 88 178 102 C 168 110 152 102 122 95 Z"
+                fill="url(#wingVeinGrad-${seed})"
+                opacity="0.55"
+              />
+              <path
+                d="M 106 98 C 118 108 132 125 148 128 C 162 128 168 118 165 108 C 152 105 132 102 110 98 Z"
+                fill="url(#wingVeinGrad-${seed})"
+                opacity="0.5"
               />
 
-              {/* Hand-drawn spiky ridges */}
-              <path d={`M 120 50 L ${137 + (h % 4)} ${20 + (h % 3)} L 142 35`} fill="none" stroke={colors.primary} strokeWidth="1.5" strokeLinecap="round" />
-              <path d={`M 142 40 L ${162 + (h % 3)} ${10 + (h % 4)} L 165 22`} fill="none" stroke={colors.primary} strokeWidth="1.5" strokeLinecap="round" />
-              <path d={`M 158 105 L ${188 + (h % 3)} ${95 + (h % 3)} L 178 102`} fill="none" stroke={colors.primary} strokeWidth="1.25" strokeLinecap="round" />
-              <path d={`M 148 125 L ${185 + (h % 4)} ${135 + (h % 3)} L 175 140`} fill="none" stroke={colors.primary} strokeWidth="1.25" strokeLinecap="round" />
+              {/* Sharp dragon spikes / claw tips */}
+              <path d="M 158 32 L 165 22 L 162 34" fill="#020205" stroke="#f472b6" strokeWidth="1" />
+              <path d="M 185 62 L 195 56 L 190 65" fill="#020205" stroke="#f472b6" strokeWidth="1" />
+              <path d="M 192 94 L 202 95 L 196 100" fill="#020205" stroke="#f472b6" strokeWidth="1" />
+              <path d="M 182 138 L 188 148 L 178 142" fill="#020205" stroke="#f472b6" strokeWidth="1" />
+
+              {/* High-contrast webbed structural lines */}
+              <path d="M 100 80 Q 128 65 158 32 M 100 80 Q 136 80 192 94 M 100 80 Q 132 102 182 138" fill="none" stroke="#020205" strokeWidth="1.5" opacity="0.8" />
+              <path d="M 158 32 C 170 48 185 62 185 62 C 188 78 192 94 192 94" fill="none" stroke="#f472b6" strokeWidth="0.75" strokeDasharray="3 2" />
             </motion.g>
           ) : (
             <g>
               <path
-                d={rightEvolvedWingPath}
+                d="M 100 80 Q 125 42 158 32 C 172 35 188 45 185 62 C 195 70 198 82 192 94 C 182 108 192 126 182 138 C 175 145 162 142 152 132 C 142 122 125 110 100 100 Z"
                 fill={`url(#evolvedWingGrad-${seed})`}
-                stroke={colors.primary}
-                strokeWidth="1.25"
+                stroke="#ec4899"
+                strokeWidth="1.5"
                 opacity="0.95"
               />
               <path
-                d={rightCell1}
-                fill={`url(#wingGlowCell-${seed})`}
-                stroke={colors.primary}
-                strokeWidth="1"
-                opacity="0.7"
+                d="M 102 84 C 118 72 135 52 152 45 C 162 52 172 62 170 75 Z"
+                fill="url(#wingVeinGrad-${seed})"
+                opacity="0.65"
               />
+              <path d="M 100 80 Q 128 65 158 32 M 100 80 Q 136 80 192 94 M 100 80 Q 132 102 182 138" fill="none" stroke="#020205" strokeWidth="1.5" opacity="0.8" />
             </g>
           )}
 
-          {/* Reptilian Segmented Tail with Scorpion Hook */}
+          {/* REPTILIAN SEGMENTED SPINE & TAIL (Beautiful scaled curvature reaching down) */}
           <g id="evolved-tail">
-            {/* Primary body spine */}
-            <rect x="94" y="65" width="12" height="42" rx="4" fill={`url(#evolvedBodyGrad-${seed})`} stroke={colors.primary} strokeWidth="1.5" />
-            
-            {/* Segmented node-scaled curving chain */}
+            {/* Thorax segments */}
+            <rect x="94" y="65" width="12" height="15" rx="3" fill="#020205" stroke="#f472b6" strokeWidth="1" />
+            <rect x="95" y="78" width="10" height="14" rx="2" fill="#020205" stroke="#f472b6" strokeWidth="1" />
+            <rect x="96" y="90" width="8" height="14" rx="2" fill="#020205" stroke="#f472b6" strokeWidth="1" />
+
+            {/* Segmented scaled tail line */}
             <path
-              d="M 100 105 Q 100 130 96 150 Q 92 165 83 175 C 77 180, 84 186, 92 181 C 102 173, 106 155, 104 135 Q 102 115 100 105 Z"
-              fill={`url(#evolvedBodyGrad-${seed})`}
-              stroke={colors.primary}
+              d="M 100 104 Q 100 134 96 154 Q 92 168 83 178 C 77 182, 84 188, 92 183 C 102 175, 106 158, 104 138 Q 102 118 100 104 Z"
+              fill="url(#evolvedBodyGrad-${seed})"
+              stroke="#f472b6"
               strokeWidth="1.25"
             />
-            {/* segmented node ribbing */}
-            <line x1="97" y1="114" x2="103" y2="114" stroke={colors.primary} strokeWidth="1.5" />
-            <line x1="96" y1="124" x2="102" y2="123" stroke={colors.primary} strokeWidth="1.5" />
-            <line x1="95" y1="134" x2="101" y2="132" stroke={colors.primary} strokeWidth="1.5" />
-            <line x1="93" y1="144" x2="99" y2="141" stroke={colors.primary} strokeWidth="1.5" />
-            <line x1="90" y1="154" x2="96" y2="150" stroke={colors.primary} strokeWidth="1.5" />
-            <line x1="86" y1="164" x2="92" y2="159" stroke={colors.primary} strokeWidth="1.5" />
-            
-            {/* scorpion barb */}
-            <path d="M 85 178 L 78 185 L 83 173 Z" fill={colors.primary} />
+
+            {/* Tail segment ribbing spines */}
+            <circle cx="99.5" cy="112" r="1.5" fill="#f472b6" />
+            <line x1="97" y1="116" x2="103" y2="116" stroke="#f472b6" strokeWidth="1.5" />
+            <line x1="96" y1="126" x2="102" y2="125" stroke="#f472b6" strokeWidth="1.5" />
+            <line x1="95" y1="136" x2="101" y2="134" stroke="#f472b6" strokeWidth="1.5" />
+            <line x1="93" y1="146" x2="99" y2="143" stroke="#f472b6" strokeWidth="1.5" />
+            <line x1="90" y1="156" x2="96" y2="152" stroke="#f472b6" strokeWidth="1.5" />
+            <line x1="86" y1="166" x2="92" y2="161" stroke="#f472b6" strokeWidth="1.5" />
+
+            {/* Scorpion hook barb at tip */}
+            <path d="M 85 180 L 76 187 L 83 175 Z" fill="#f472b6" stroke="#ffffff" strokeWidth="0.5" />
           </g>
 
-          {/* Glowing chest crystal node - matching the primary glow color */}
-          <g transform="translate(100, 75) scale(0.9) translate(-10, -10)">
+          {/* HEAD WITH GLOWING REPTILIAN EYE SLITS */}
+          <g>
+            <path d="M 94 65 L 100 56 L 106 65 Z" fill="#020205" stroke="#f472b6" strokeWidth="1" />
+            {/* Glow eye left */}
+            <polygon points="96.5,61 99,62 98,60" fill="#f43f5e" filter="url(#neon-glow-filter)" />
+            {/* Glow eye right */}
+            <polygon points="103.5,61 101,62 102,60" fill="#f43f5e" filter="url(#neon-glow-filter)" />
+          </g>
+
+          {/* GLOWING CRYSTALLINE CORE HEART GEM ON CHEST */}
+          <g transform="translate(100, 78) scale(0.9) translate(-10, -10)">
+            {/* Outer aura */}
             <path
               d="M 10 18 C 10 18, 2 12, 2 6 C 2 2.5, 4.5 0, 7.5 0 C 9.5 0, 10.5 1.5, 11 2 C 11.5 1.5, 12.5 0, 14.5 0 C 17.5 0, 20 2.5, 20 6 C 20 12, 12 18, 12 18 Z"
-              fill={colors.primary}
+              fill="#fb7185"
               className="animate-pulse"
+              filter="url(#neon-glow-filter)"
             />
+            {/* Face details */}
             <path
-              d="M 10 16 C 10 16, 4 11, 4 6 Q 4 4 6 4 Q 8 4 9 5 L 10 6 L 11 5 Q 12 4 14 4 Q 16 4 16 6 C 16 11, 10 16, 10 16 Z"
-              fill="#ffffff"
+              d="M 10 16 L 4 6 Q 6 4 10 7 L 10 16 Z"
+              fill="#f43f5e"
               opacity="0.9"
             />
+            <path
+              d="M 10 16 L 16 6 Q 14 4 10 7 L 10 16 Z"
+              fill="#fda4af"
+              opacity="0.9"
+            />
+            <circle cx="10" cy="8" r="1.5" fill="#ffffff" />
           </g>
         </svg>
       </div>

@@ -10,33 +10,35 @@
       <stop offset="100%" stop-color="#020204" stop-opacity="0" />
     </radialGradient>
 
-    <!-- Butterfly Wing Gradients -->
+    <!-- Butterfly Wing Gradients: Evolved Gothic Theme -->
     <linearGradient id="left-wing-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#F59E0B" />
-      <stop offset="60%" stop-color="#D97706" />
-      <stop offset="100%" stop-color="#A855F7" stop-opacity="0.4" />
+      <stop offset="0%" stop-color="#2e1065" />
+      <stop offset="40%" stop-color="#ec4899" />
+      <stop offset="75%" stop-color="#f472b6" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.9" />
     </linearGradient>
     <linearGradient id="right-wing-grad" x1="100%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#A855F7" />
-      <stop offset="60%" stop-color="#8B5CF6" />
-      <stop offset="100%" stop-color="#F59E0B" stop-opacity="0.4" />
+      <stop offset="0%" stop-color="#2e1065" />
+      <stop offset="40%" stop-color="#ec4899" />
+      <stop offset="75%" stop-color="#f472b6" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.9" />
     </linearGradient>
 
     <!-- Metallic body gradient -->
     <linearGradient id="body-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#1E293B" />
-      <stop offset="50%" stop-color="#F59E0B" />
-      <stop offset="100%" stop-color="#1E293B" />
+      <stop offset="0%" stop-color="#020205" />
+      <stop offset="50%" stop-color="#ec4899" />
+      <stop offset="100%" stop-color="#020205" />
     </linearGradient>
 
     <!-- Hexagon or Tech Pattern -->
     <pattern id="grid-pattern" width="60" height="60" patternUnits="userSpaceOnUse">
-      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#F59E0B" stroke-opacity="0.04" stroke-width="1" />
-      <circle cx="0" cy="0" r="1.5" fill="#F59E0B" fill-opacity="0.15" />
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#ec4899" stroke-opacity="0.04" stroke-width="1" />
+      <circle cx="0" cy="0" r="1.5" fill="#ec4899" fill-opacity="0.15" />
     </pattern>
 
     <filter id="beauty-glow">
-      <feGaussianBlur stdDeviation="15" result="coloredBlur"/>
+      <feGaussianBlur stdDeviation="10" result="coloredBlur"/>
       <feMerge>
         <feMergeNode in="coloredBlur"/>
         <feMergeNode in="SourceGraphic"/>
@@ -52,49 +54,61 @@
   <rect width="1200" height="630" fill="url(#grid-pattern)" />
 
   <!-- Decorative Tech Circles in background -->
-  <circle cx="600" cy="315" r="320" fill="none" stroke="#F59E0B" stroke-opacity="0.03" stroke-width="2" />
-  <circle cx="600" cy="315" r="240" fill="none" stroke="#F59E0B" stroke-opacity="0.05" stroke-width="1" stroke-dasharray="10 15" />
-  <circle cx="600" cy="315" r="160" fill="none" stroke="#A855F7" stroke-opacity="0.04" stroke-width="1" />
+  <circle cx="600" cy="315" r="320" fill="none" stroke="#ec4899" stroke-opacity="0.03" stroke-width="2" />
+  <circle cx="600" cy="315" r="240" fill="none" stroke="#ec4899" stroke-opacity="0.05" stroke-width="1" stroke-dasharray="10 15" />
+  <circle cx="600" cy="315" r="160" fill="none" stroke="#a855f7" stroke-opacity="0.04" stroke-width="1" />
 
   <!-- Outer Framing Corners -->
-  <path d="M 40 60 L 40 40 L 60 40" fill="none" stroke="#F59E0B" stroke-opacity="0.3" stroke-width="2" />
-  <path d="M 1160 60 L 1160 40 L 1140 40" fill="none" stroke="#F59E0B" stroke-opacity="0.3" stroke-width="2" />
-  <path d="M 40 570 L 40 590 L 60 590" fill="none" stroke="#F59E0B" stroke-opacity="0.3" stroke-width="2" />
-  <path d="M 1160 570 L 1160 590 L 1140 590" fill="none" stroke="#F59E0B" stroke-opacity="0.3" stroke-width="2" />
+  <path d="M 40 60 L 40 40 L 60 40" fill="none" stroke="#ec4899" stroke-opacity="0.3" stroke-width="2" />
+  <path d="M 1160 60 L 1160 40 L 1140 40" fill="none" stroke="#ec4899" stroke-opacity="0.3" stroke-width="2" />
+  <path d="M 40 570 L 40 590 L 60 590" fill="none" stroke="#ec4899" stroke-opacity="0.3" stroke-width="2" />
+  <path d="M 1160 570 L 1160 590 L 1140 590" fill="none" stroke="#ec4899" stroke-opacity="0.3" stroke-width="2" />
 
   <!-- TOP BRANDING OVERLAYS -->
-  <text x="600" y="75" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="900" fill="#F59E0B" letter-spacing="8" text-anchor="middle" opacity="0.6">
-    VERIFIABLE CREDITENTIAL DECENTRALIZED PROTOCOL
+  <text x="600" y="75" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="900" fill="#ec4899" letter-spacing="8" text-anchor="middle" opacity="0.6">
+    VERIFIABLE CREDENTIAL DECENTRALIZED PROTOCOL
   </text>
 
   <!-- THE GLOWING BUTTERFLY GRAPHIC (CENTERED) -->
-  <g transform="translate(600, 290) scale(2.2)" filter="url(#beauty-glow)" style="overflow:visible;">
+  <g transform="translate(600, 290) scale(2.4)" filter="url(#beauty-glow)" style="overflow:visible;">
     <!-- Wings Underglow Shadows for depth -->
-    <path d="M 0,-10 Q -45,-65 -85,-40 Q -105,-15 -65,15 Q -15,5 0,10 Z" fill="#F59E0B" opacity="0.1" />
-    <path d="M 0,-10 Q 45,-65 85,-40 Q 105,-15 65,15 Q 15,5 0,10 Z" fill="#A855F7" opacity="0.1" />
+    <path d="M 0,-10 C -25,-48 -58,-58 -72,-55 C -84,-43 -88,-28 -85,-22 C -95,-12 -98 2 -92 14 C -82 28 -92 46 -82 58 Q -50,45 0,10 Z" fill="#ec4899" opacity="0.12" />
+    <path d="M 0,-10 C 25,-48 58,-58 72,-55 C 84,-43 88,-28 85,-22 C 95,-12 98 2 92 14 C 82 28 92 46 82 58 Q 50,45 0,10 Z" fill="#a855f7" opacity="0.12" />
 
-    <!-- Upper Wings -->
-    <path d="M 0,-10 Q -45,-65 -85,-40 Q -105,-15 -65,15 Q -15,5 0,10 Z" fill="url(#left-wing-grad)" stroke="#F59E0B" stroke-width="1.5" stroke-opacity="0.8" />
-    <path d="M 0,-10 Q 45,-65 85,-40 Q 105,-15 65,15 Q 15,5 0,10 Z" fill="url(#right-wing-grad)" stroke="#A855F7" stroke-width="1.5" stroke-opacity="0.8" />
+    <!-- Dragon Horns (Spiky Curving Antennas) -->
+    <path d="M -3,-24 Q -9,-49 -21,-67 Q -9,-57 -6,-43 Q -13,-51 -17,-55" fill="#020205" stroke="#ec4899" stroke-width="1" />
+    <path d="M 3,-24 Q 9,-49 21,-67 Q 9,-57 6,-43 Q 13,-51 17,-55" fill="#020205" stroke="#ec4899" stroke-width="1" />
 
-    <!-- Upper Wing Accents / Decals -->
-    <path d="M -20,-20 Q -50,-50 -75,-35 Q -65,-15 -35,-5 Z" fill="none" stroke="#ffffff" stroke-width="1" stroke-opacity="0.35" />
-    <path d="M 20,-20 Q 50,-50 75,-35 Q 65,-15 35,-5 Z" fill="none" stroke="#ffffff" stroke-width="1" stroke-opacity="0.35" />
+    <!-- Left Upper Wing (Spiky bat/dragon wing pattern) -->
+    <path d="M 0,-10 Q -25,-48 -58,-58 C -72,-55 -88,-45 -85,-28 C -95,-20 -98,-8 -92,4 C -82,18 -92,36 -82,48 C -75,55 -62,52 -52,42 C -42,32 -25,20 0,10 Z" fill="url(#left-wing-grad)" stroke="#ec4899" stroke-width="1.5" stroke-opacity="0.95" />
+    
+    <!-- Right Upper Wing (Spiky bat/dragon wing pattern) -->
+    <path d="M 0,-10 Q 25,-48 58,-58 C 72,-55 88,-45 85,-28 C 95,-20 98,-8 92,4 C 82,18 92,36 82,48 C 75,55 62,52 52,42 C 42,32 25,20 0,10 Z" fill="url(#right-wing-grad)" stroke="#ec4899" stroke-width="1.5" stroke-opacity="0.95" />
 
-    <!-- Lower Wings -->
-    <path d="M 0,10 Q -45,15 -55,42 Q -45,62 -25,52 Q -10,42 0,10 Z" fill="url(#left-wing-grad)" stroke="#F59E0B" stroke-width="1.2" stroke-opacity="0.6" />
-    <path d="M 0,10 Q 45,15 55,42 Q 45,62 25,52 Q 10,42 0,10 Z" fill="url(#right-wing-grad)" stroke="#A855F7" stroke-width="1.2" stroke-opacity="0.6" />
+    <!-- Internal wing detail lines -->
+    <path d="M 0,-10 Q -28,-25 -58,-58 M 0,-10 Q -36,-10 -92,4 M 0,-10 Q -32,12 -82,48" fill="none" stroke="#020205" stroke-width="1.5" stroke-opacity="0.9" />
+    <path d="M 0,-10 Q 28,-25 58,-58 M 0,-10 Q 36,-10 92,4 M 0,-10 Q 32,12 82,48" fill="none" stroke="#020205" stroke-width="1.5" stroke-opacity="0.9" />
 
-    <!-- Antennas -->
-    <path d="M0,-24 Q -12,-45 -22,-50" fill="none" stroke="#F59E0B" stroke-width="1.5" stroke-linecap="round" />
-    <path d="M0,-24 Q 12,-45 22,-50" fill="none" stroke="#A855F7" stroke-width="1.5" stroke-linecap="round" />
-    <circle cx="-22" cy="-50" r="2.5" fill="#F59E0B" />
-    <circle cx="22" cy="-50" r="2.5" fill="#A855F7" />
+    <!-- Body Core Spine segments -->
+    <rect x="-6" y="-24" width="12" height="15" rx="3" fill="#020205" stroke="#f472b6" stroke-width="1.2" />
+    <rect x="-5" y="-11" width="10" height="14" rx="2" fill="#020205" stroke="#f472b6" stroke-width="1.2" />
+    <rect x="-4" y="1" width="8" height="14" rx="2" fill="#020205" stroke="#f472b6" stroke-width="1.2" />
 
-    <!-- Body Core -->
-    <rect x="-3" y="-28" width="6" height="56" rx="3" fill="url(#body-grad)" stroke="#020204" stroke-width="1" />
-    <circle cx="0" cy="-24" r="5" fill="#F59E0B" />
-    <circle cx="0" cy="-24" r="2" fill="#FFFFFF" />
+    <!-- Segmented reptilian tail curving down -->
+    <path d="M 0,15 Q 0,40 -4,60 Q -8,74 -17,84 C -23,88 -16,94 -8,89 C 2,81 6,64 4,44 Q 2,24 0,15 Z" fill="url(#body-grad)" stroke="#f472b6" stroke-width="1.2" />
+
+    <!-- Sharp scorpion hook tip -->
+    <path d="M -15,86 L -24,93 L -17,81 Z" fill="#f472b6" stroke="#ffffff" stroke-width="0.5" />
+
+    <!-- Dragon Head & Glowing Eyes -->
+    <polygon points="-6,-24 0,-33 6,-24" fill="#020205" stroke="#ec4899" stroke-width="1" />
+    <polygon points="-4,-28 -2,-27 -3,-29" fill="#f43f5e" />
+    <polygon points="4,-28 2,-27 3,-29" fill="#f43f5e" />
+
+    <!-- Glowing Crystalline Chest Heart Gem -->
+    <path d="M 0,-5 C 0,-5, -4,-10, -4,-15 C -4,-18, -2,-20, 0,-20 C 2,-20, 4,-18, 4,-15 C 4,-10, 0,-5, 0,-5 Z" fill="#fb7185" />
+    <circle cx="0" cy="-15" r="1.5" fill="#ffffff" />
+  </g>
 
     <!-- Glowing Node Connectors on the butterfly to look techy -->
     <line x1="-85" y1="-40" x2="-65" y2="15" stroke="#FFFFFF" stroke-opacity="0.2" stroke-width="1" />

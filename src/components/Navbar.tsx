@@ -66,6 +66,7 @@ export default function Navbar({ onScanClick, isLightMode, onThemeToggle }: Navb
     { label: 'Registry', href: '#registry' },
     { label: 'PFP Overlay', href: '#profile-overlay' },
     { label: 'Treasury', href: '#treasury' },
+    { label: 'Karma Games 🎮', href: 'https://ai.studio/apps/c9570cb3-7779-4863-ac57-0047ef654b4a?fullscreenApplet=true', external: true },
     { label: 'Utility', href: '#utility' },
   ];
 
@@ -101,7 +102,13 @@ export default function Navbar({ onScanClick, isLightMode, onThemeToggle }: Navb
               <a
                 key={item.label}
                 href={item.href}
-                className="text-slate-300 hover:text-[#F59E0B] font-sans font-medium text-xs tracking-wider uppercase transition-colors"
+                target={item.external ? '_blank' : undefined}
+                rel={item.external ? 'noopener noreferrer' : undefined}
+                className={
+                  item.external 
+                    ? 'text-amber-400 hover:text-[#F59E0B] hover:scale-105 font-sans font-black text-xs tracking-wider uppercase transition-all flex items-center gap-1 bg-amber-500/10 border border-amber-500/20 px-2 py-1 rounded-lg' 
+                    : 'text-slate-300 hover:text-[#F59E0B] font-sans font-medium text-xs tracking-wider uppercase transition-colors'
+                }
               >
                 {item.label}
               </a>
@@ -344,7 +351,13 @@ export default function Navbar({ onScanClick, isLightMode, onThemeToggle }: Navb
               key={item.label}
               href={item.href}
               onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 text-slate-300 hover:text-[#F59E0B] font-sans font-medium text-xs tracking-widest uppercase border-b border-white/5"
+              target={item.external ? '_blank' : undefined}
+              rel={item.external ? 'noopener noreferrer' : undefined}
+              className={
+                item.external
+                  ? 'block py-2 pb-2.5 text-amber-400 hover:text-[#F59E0B] font-sans font-black text-xs tracking-widest uppercase border-b border-white/5 animate-pulse'
+                  : 'block py-2 text-slate-300 hover:text-[#F59E0B] font-sans font-medium text-xs tracking-widest uppercase border-b border-white/5'
+              }
             >
               {item.label}
             </a>

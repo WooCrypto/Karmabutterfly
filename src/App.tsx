@@ -1,17 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
-import WalletAnalyzer from './components/WalletAnalyzer';
-import DualitySection from './components/DualitySection';
-import UtilitySection from './components/UtilitySection';
-import BroadbandTreasury from './components/TreasuryPool';
-import Roadmap from './components/Roadmap';
-import TeamBios from './components/TeamBios';
-import FAQ from './components/FAQ';
-import ButterflyRegistry from './components/ButterflyRegistry';
 import SvgButterfly from './components/SvgButterfly';
-import ProfileOverlay from './components/ProfileOverlay';
-import ManifestoSection from './components/ManifestoSection';
-import WhyKarmaExist from './components/WhyKarmaExist';
+import SwarmTerminal from './components/SwarmTerminal';
 import { ArrowDown, Flame, ShieldAlert, Sparkles, Network, BookOpen, X, Heart, ExternalLink, Zap, Globe, Twitter, Link, Check, Share2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -91,6 +81,7 @@ export default function App() {
   }, []);
 
   const scrollToAnalyzer = () => {
+    window.location.hash = '#analyzer';
     if (analyzerRef.current) {
       analyzerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -318,58 +309,10 @@ export default function App() {
         </div>
       </header>
 
-      {/* Balanced Duality Section component */}
-      <DualitySection />
-
-      {/* Manifesto Section backing quality and support */}
-      <ManifestoSection />
-
-      {/* Interactive Impact & Purpose Nexus: Why Karma Butterflies Exist */}
-      <WhyKarmaExist />
-
-      {/* Live Interactive Decoder Section component */}
-      <section ref={analyzerRef} id="analyzer" className="py-20 relative overflow-hidden bg-[#050505] border-t border-b border-white/10">
-        {/* Colorful backgrounds */}
-        <div className="absolute top-1/2 left-10 w-96 h-96 rounded-full bg-[#F59E0B]/5 blur-3xl pointer-events-none" />
-        <div className="absolute top-1/2 right-10 w-96 h-96 rounded-full bg-purple-500/5 blur-3xl pointer-events-none" />
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center max-w-2xl mx-auto mb-14">
-            <span className="text-xs font-mono text-[#F59E0B] uppercase tracking-widest block mb-2">
-              Interactive Decoding Engine
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-sans font-black text-white tracking-tight">
-              Test your on-chain karma alignment.
-            </h2>
-            <p className="text-slate-400 text-sm mt-3 leading-relaxed">
-              Every wallet tells a story. Paste your EVM audit address below to simulate of how our scoring system scans indexes to craft your unique generative Karma Butterfly shape.
-            </p>
-          </div>
-
-          <WalletAnalyzer />
-        </div>
-      </section>
-
-      {/* Complete collection registry & progressive exporter */}
-      <ButterflyRegistry />
-
-      {/* Social Identity PFP Customizer suite */}
-      <ProfileOverlay />
-
-      {/* Interactive dynamic USDT Treasury Pool matching collective values */}
-      <BroadbandTreasury />
-
-      {/* Value Architecture Utility Section component */}
-      <UtilitySection />
-
-      {/* Chronological Roadmap Section component */}
-      <Roadmap />
-
-      {/* Core Team Bios section component */}
-      <TeamBios />
-
-      {/* FAQ Accordion section component */}
-      <FAQ />
+      {/* Main Consolidated SwarmTerminal Dashboard */}
+      <div ref={analyzerRef}>
+        <SwarmTerminal isLightMode={isLightMode} />
+      </div>
 
       {/* Bottom Final CTA Footer Block */}
       <footer className="bg-[#050505] border-t border-white/10 pt-16 pb-12 relative overflow-hidden">
