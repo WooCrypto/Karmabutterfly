@@ -2,8 +2,10 @@ import { useRef, useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import SvgButterfly from './components/SvgButterfly';
 import SwarmTerminal from './components/SwarmTerminal';
+import ProfileOverlay from './components/ProfileOverlay';
+import KarmaGamezAd from './components/KarmaGamezAd';
 import FAQ from './components/FAQ';
-import { ArrowDown, Flame, ShieldAlert, Sparkles, Network, BookOpen, X, Heart, ExternalLink, Zap, Globe, Twitter, Link, Check, Share2 } from 'lucide-react';
+import { ArrowDown, Flame, ShieldAlert, Sparkles, Network, BookOpen, X, Heart, ExternalLink, Zap, Globe, Twitter, Link, Check, Share2, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function App() {
@@ -81,6 +83,14 @@ export default function App() {
     return () => clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    const handleOpenStory = () => {
+      setIsStoryOpen(true);
+    };
+    window.addEventListener('open-inspiration-story', handleOpenStory);
+    return () => window.removeEventListener('open-inspiration-story', handleOpenStory);
+  }, []);
+
   const scrollToAnalyzer = () => {
     window.location.hash = '#analyzer';
     if (analyzerRef.current) {
@@ -121,13 +131,13 @@ export default function App() {
         </span>
         <button 
           onClick={() => setIsStoryOpen(true)}
-          className="underline hover:text-amber-950 transition font-black uppercase text-[10px] tracking-widest ml-1 shrink-0 bg-black/10 px-2 py-0.5 rounded border border-black/10"
+          className="underline hover:text-amber-950 transition font-black uppercase text-[10px] tracking-widest ml-1 shrink-0 bg-black/10 px-2.5 py-0.5 rounded border border-black/10 cursor-pointer"
         >
-          Our Story
+          What Inspired Me
         </button>
         <span className="opacity-30">|</span>
         <a 
-          href="https://gravemint.io/"
+          href="https://gravemint.io/mint/FXSVHzLvVFey57U8ETuhHzrzDRT3FhvqzbxWpyoAJA4c"
           target="_blank"
           rel="noreferrer"
           className="bg-black text-white hover:bg-neutral-900 px-3 py-1 rounded-full text-[9px] font-mono tracking-widest hover:scale-102 transition-all shrink-0 font-extrabold flex items-center gap-1 shadow shadow-black/80"
@@ -206,16 +216,23 @@ export default function App() {
                 Scan Your Alignment
               </button>
 
+              <a
+                href="#staking"
+                className="px-6 py-3 bg-neutral-950 text-emerald-400 hover:text-emerald-300 hover:bg-black rounded-full font-sans font-black text-xs tracking-wider uppercase transition-all shadow-md active:scale-97 text-center whitespace-nowrap inline-flex items-center gap-2 border border-emerald-500/20"
+              >
+                <span>Earn Karma Power Tokens Free 🪙</span>
+              </a>
+
               <button
                 onClick={scrollToOverlay}
                 className="px-6 py-3 bg-neutral-950 text-amber-400 hover:text-white hover:bg-black rounded-full font-sans font-black text-xs tracking-wider uppercase transition-all shadow-md active:scale-97 cursor-pointer text-center whitespace-nowrap inline-flex items-center gap-1.5 border border-neutral-900"
               >
-                <span>PFP Overlay</span>
+                <span>Add Floating X Badge</span>
                 <span className="text-xs">📸</span>
               </button>
               
               <a
-                href="https://gravemint.io/"
+                href="https://gravemint.io/mint/FXSVHzLvVFey57U8ETuhHzrzDRT3FhvqzbxWpyoAJA4c"
                 target="_blank"
                 rel="noreferrer"
                 className="px-6 py-3 bg-white text-black hover:bg-neutral-100 rounded-full font-sans font-black text-xs tracking-wider uppercase transition shadow-md active:scale-97 text-center whitespace-nowrap inline-flex items-center gap-2 border border-black/15 shadow-black/10"
@@ -262,7 +279,7 @@ export default function App() {
                 <div>
                   <span className="font-mono text-slate-500 text-[10px] uppercase tracking-wider block mb-1">WHO WE ARE</span>
                   <h3 className="text-xl sm:text-2xl font-sans font-black text-white tracking-tight leading-snug">
-                    Karma Butterflies NFTs are for builders, creators, and believers in a better crypto space.
+                    Karma Butterflies NFTs are for builders, creators, token creators, traders ,marketers, communities but most of all believers in a better crypto space.
                   </h3>
                 </div>
 
@@ -296,40 +313,16 @@ export default function App() {
             </div>
           </div>
 
-          {/* Massive Story Button Section (col-span-12) */}
+          {/* Add Floating X Badge Section (col-span-12) */}
           <div className="lg:col-span-12 mt-2">
-            <button 
-              onClick={() => setIsStoryOpen(true)}
-              className="w-full relative group overflow-hidden bg-gradient-to-r from-stone-950 via-[#121212] to-stone-950 border-2 border-amber-500/30 hover:border-amber-500/80 rounded-2xl p-6 sm:p-8 transition-all duration-300 text-left flex flex-col md:flex-row md:items-center justify-between gap-6 cursor-pointer hover:shadow-[0_0_30px_rgba(245,158,11,0.15)] group"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-amber-500/0 via-amber-500/5 to-amber-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-              
-              <div className="flex items-start sm:items-center gap-5 relative z-10 w-full md:w-3/4">
-                <div className="w-14 h-14 rounded-xl bg-amber-500/10 border border-[#F59E0B]/30 flex items-center justify-center text-3xl shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shadow-inner">
-                  📖
-                </div>
-                <div>
-                  <span className="text-[10px] font-mono text-[#F59E0B] uppercase tracking-[0.2em] font-extrabold block mb-1.5 animate-pulse">
-                    The Human Side of the Swarm
-                  </span>
-                  <h3 className="text-xl sm:text-2.5xl font-sans font-black text-white group-hover:text-[#F59E0B] transition-colors tracking-tight leading-none mb-2">
-                    The Story Behind Karma Butterflies
-                  </h3>
-                  <p className="text-slate-400 text-xs sm:text-sm leading-relaxed max-w-2xl font-medium">
-                    This project wasn't born from a marketing plan. It was born during one of the hardest times of my life. Tap to read how community, karma, and healing became real-life wings.
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-2.5 text-black bg-[#F59E0B] hover:bg-amber-450 font-sans font-extrabold text-xs uppercase tracking-wider px-6 py-3 rounded-xl shadow-lg relative z-10 self-start md:self-auto group-hover:scale-105 transition-all w-full sm:w-auto justify-center">
-                <span>The Story</span>
-                <span className="text-base leading-none">🦋</span>
-              </div>
-            </button>
+            <ProfileOverlay />
           </div>
 
         </div>
       </header>
+
+      {/* High-Impact Karma Gamez Promotion */}
+      <KarmaGamezAd />
 
       {/* Main Consolidated SwarmTerminal Dashboard */}
       <div id="analyzer" ref={analyzerRef}>
@@ -340,10 +333,119 @@ export default function App() {
       <FAQ />
 
       {/* Bottom Final CTA Footer Block */}
-      <footer className="bg-[#050505] border-t border-white/10 pt-16 pb-12 relative overflow-hidden">
+      <footer className="bg-gradient-to-b from-[#08080a] via-[#030304] to-[#010102] border-t border-white/10 pt-20 pb-12 relative overflow-hidden">
+        {/* Subtle background ambient glows */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#F59E0B]/5 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#10B981]/5 rounded-full blur-[120px] pointer-events-none" />
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          
+          {/* Dedicated Narrative/Inspiration Block */}
+          <div id="inspiration" className="mb-20 border-b border-white/5 pb-16">
+            <div className="max-w-2xl mx-auto bg-gradient-to-br from-[#0B0B0D] to-[#050506] border border-white/5 p-8 sm:p-10 rounded-[32px] relative overflow-hidden text-center shadow-2xl">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-[#F59E0B]/5 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -inset-px rounded-[32px] bg-gradient-to-br from-white/10 to-transparent opacity-50 pointer-events-none" />
+              
+              <span className="text-[10px] font-mono text-[#F59E0B] uppercase tracking-[0.25em] font-black block mb-4">
+                ORIGIN & TRANSCENDENCE
+              </span>
+              <h3 className="text-2xl sm:text-3xl font-display font-black text-white tracking-tight leading-snug mb-4">
+                What Inspired Karma Butterflies?
+              </h3>
+              <p className="text-slate-400 text-xs sm:text-sm leading-relaxed mb-8 max-w-md mx-auto">
+                Discover the real struggle, resilience, and community transformation that turned a personal hardship into a powerful framework of digital trust.
+              </p>
+              
+              <button
+                type="button"
+                onClick={() => setIsStoryOpen(true)}
+                className="px-8 py-4 bg-gradient-to-r from-[#F59E0B] to-amber-500 hover:from-amber-400 hover:to-amber-500 text-black font-sans font-black text-xs uppercase tracking-widest rounded-2xl transition duration-300 shadow-xl shadow-amber-500/10 hover:shadow-amber-500/25 hover:scale-[1.02] active:scale-[0.98] cursor-pointer inline-flex items-center gap-2.5"
+              >
+                <span>Read What Inspired Me</span>
+                <span className="text-sm">🦋</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Social Links Callout Section - Premium interactive deck */}
+          <div className="mb-16 bg-[#09090B]/80 border border-white/5 rounded-3xl p-6 sm:p-8 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#F59E0B]/30 to-transparent" />
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+              <div className="space-y-2 text-center lg:text-left">
+                <span className="text-[10px] font-mono text-[#F59E0B] uppercase tracking-[0.2em] font-extrabold block">
+                  COMMUNITY SWARM HUB
+                </span>
+                <h4 className="text-lg sm:text-xl font-display font-black text-white tracking-tight">
+                  Join the Karma Reputation Revolution
+                </h4>
+                <p className="text-slate-400 text-xs sm:text-sm max-w-md">
+                  Connect with fellow builders, track network reputation campaigns, and participate in exclusive holder updates across our official social channels.
+                </p>
+              </div>
+
+              {/* High-Fidelity Social Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 w-full lg:w-auto shrink-0">
+                {/* Official X Link */}
+                <a 
+                  href="https://x.com/karmaaiscore" 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="flex items-center justify-center gap-2.5 px-5 py-3.5 rounded-2xl bg-black border border-white/10 hover:border-[#F59E0B]/50 hover:bg-[#F59E0B]/5 text-white hover:text-[#F59E0B] transition-all duration-350 cursor-pointer group shadow-md"
+                >
+                  <Twitter className="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" />
+                  <div className="text-left font-sans">
+                    <span className="text-[9px] font-mono text-slate-500 block uppercase tracking-wider group-hover:text-[#F59E0B]/70 leading-none">OFFICIAL X</span>
+                    <span className="text-xs font-bold font-sans tracking-wide block mt-0.5 text-white group-hover:text-white">@karmaaiscore</span>
+                  </div>
+                </a>
+
+                {/* Telegram Link */}
+                <a 
+                  href="https://t.me/KarmaScore" 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="flex items-center justify-center gap-2.5 px-5 py-3.5 rounded-2xl bg-black border border-white/10 hover:border-emerald-500/50 hover:bg-emerald-500/5 text-white hover:text-emerald-400 transition-all duration-350 cursor-pointer group shadow-md"
+                >
+                  <Send className="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" />
+                  <div className="text-left font-sans">
+                    <span className="text-[9px] font-mono text-slate-500 block uppercase tracking-wider group-hover:text-emerald-400/70 leading-none">TELEGRAM</span>
+                    <span className="text-xs font-bold font-sans tracking-wide block mt-0.5 text-white group-hover:text-white">KarmaScore Hub</span>
+                  </div>
+                </a>
+
+                {/* Founder / Community Creator X */}
+                <a 
+                  href="https://x.com/buzz_bver" 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="flex items-center justify-center gap-2.5 px-5 py-3.5 rounded-2xl bg-black border border-white/10 hover:border-[#F59E0B]/50 hover:bg-[#F59E0B]/5 text-white hover:text-[#F59E0B] transition-all duration-350 cursor-pointer group shadow-md"
+                >
+                  <span className="text-base shrink-0 group-hover:animate-bounce">🐝</span>
+                  <div className="text-left font-sans">
+                    <span className="text-[9px] font-mono text-slate-500 block uppercase tracking-wider group-hover:text-[#F59E0B]/70 leading-none">COMMUNITY</span>
+                    <span className="text-xs font-bold font-sans tracking-wide block mt-0.5 text-white group-hover:text-white">@buzz_bver</span>
+                  </div>
+                </a>
+
+                {/* Foster Community Hub */}
+                <a 
+                  href="https://x.com/i/communities/1989241165577613796" 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="flex items-center justify-center gap-2.5 px-5 py-3.5 rounded-2xl bg-gradient-to-br from-amber-500/10 to-amber-600/5 border border-[#F59E0B]/20 hover:border-[#F59E0B]/60 hover:from-amber-500/15 text-[#F59E0B] transition-all duration-350 cursor-pointer group shadow-lg"
+                >
+                  <span className="text-base shrink-0 group-hover:rotate-12 transition-transform">👑</span>
+                  <div className="text-left font-sans">
+                    <span className="text-[9px] font-mono text-amber-500/70 block uppercase tracking-widest leading-none">X COMMUNITY</span>
+                    <span className="text-xs font-black font-sans tracking-wider block mt-0.5 text-white">Foster Swarm</span>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+
           {/* Main Top footer rows */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-10 items-start pb-12 border-b border-white/5">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-10 items-start pb-16 border-b border-white/5">
             {/* Logo description */}
             <div className="md:col-span-5 space-y-4">
               <div className="flex items-center gap-2.5">
@@ -354,7 +456,7 @@ export default function App() {
                   <span className="text-white font-sans font-bold text-sm tracking-wide block leading-none">
                     Karma Butterflies
                   </span>
-                  <span className="text-gray-500 font-mono text-[8px] uppercase tracking-widest mt-1 block">
+                  <span className="text-gray-500 font-mono text-[8px] uppercase tracking-[0.25em] mt-1.5 block">
                     The Cultural Layer Of Trust
                   </span>
                 </div>
@@ -362,52 +464,57 @@ export default function App() {
               <p className="text-slate-400 text-xs max-w-sm leading-relaxed">
                 We are transitioning from the age of speculation to the age of credentialed reputation. Join the swarms to verify, reward, and protect what is built.
               </p>
-              <div className="bg-amber-950/10 border border-[#F59E0B]/10 rounded-xl p-3 max-w-sm space-y-1">
-                <span className="text-[9px] font-mono text-[#F59E0B] uppercase tracking-wider block font-black">
-                  Multi-Chain Launches
+              <div className="bg-amber-950/10 border border-[#F59E0B]/10 rounded-2xl p-4 max-w-sm space-y-1.5">
+                <span className="text-[9px] font-mono text-[#F59E0B] uppercase tracking-[0.15em] block font-black">
+                  🛡️ Multi-Chain Launchpad
                 </span>
                 <p className="text-slate-400 text-[11px] leading-relaxed">
-                  Community NFT launches will be on <strong className="text-slate-200">Solana</strong>, <strong className="text-slate-200">Hedera</strong>, <strong className="text-slate-200">BSC</strong>, <strong className="text-slate-200">Ethereum</strong>, and <strong className="text-slate-200">Base</strong> chain.
+                  Community NFT alignment launches will be on <strong className="text-slate-200 font-bold">Solana</strong>, <strong className="text-slate-200 font-bold">Hedera</strong>, <strong className="text-slate-200 font-bold">BSC</strong>, <strong className="text-slate-200 font-bold">Ethereum</strong>, and <strong className="text-slate-200 font-bold">Base</strong> network.
                 </p>
               </div>
             </div>
 
             {/* Quick Links Column */}
             <div className="md:col-span-3 space-y-4">
-              <h4 className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest">
+              <h4 className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-[0.2em]">
                 Jump To Section
               </h4>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <a href="#narrative" className="text-slate-400 hover:text-[#F59E0B] transition">Narrative</a>
-                <a href="#duality" className="text-slate-400 hover:text-[#F59E0B] transition">Duality</a>
-                <a href="#utility" className="text-slate-400 hover:text-[#F59E0B] transition">Utility</a>
-                <a href="#roadmap" className="text-slate-400 hover:text-[#F59E0B] transition">Roadmap</a>
-                <a href="#team" className="text-slate-400 hover:text-[#F59E0B] transition">Guardians</a>
-                <a href="#faq" className="text-slate-400 hover:text-[#F59E0B] transition">FAQ</a>
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <a href="#inspiration" className="text-slate-400 hover:text-[#F59E0B] transition-colors">Inspiration</a>
+                <a href="#duality" className="text-slate-400 hover:text-[#F59E0B] transition-colors">Duality</a>
+                <a href="#utility" className="text-slate-400 hover:text-[#F59E0B] transition-colors">Utility</a>
+                <a href="#roadmap" className="text-slate-400 hover:text-[#F59E0B] transition-colors">Roadmap</a>
+                <a href="#team" className="text-slate-400 hover:text-[#F59E0B] transition-colors">Guardians</a>
+                <a href="#faq" className="text-slate-400 hover:text-[#F59E0B] transition-colors">FAQ</a>
               </div>
             </div>
 
             {/* Powerful Vision recap */}
-            <div className="md:col-span-4 bg-[#1A1A1A] border border-white/10 p-5 rounded-2xl space-y-2">
-              <h4 className="text-[10px] font-mono font-bold text-[#F59E0B] uppercase tracking-widest">
+            <div className="md:col-span-4 bg-[#0B0B0D] border border-white/5 p-5 rounded-2xl space-y-3 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none" />
+              <h4 className="text-[10px] font-mono font-bold text-[#F59E0B] uppercase tracking-[0.2em]">
                 The Long-Term Vision
               </h4>
-              <div className="space-y-1.5 font-sans text-xs">
-                <p className="text-slate-200"><strong className="text-white">KarmaScore:</strong> The reputation layer.</p>
-                <p className="text-slate-200"><strong className="text-white">Karma Token:</strong> The economic layer.</p>
-                <p className="text-slate-200"><strong className="text-white">Karma Butterflies:</strong> The cultural layer.</p>
+              <div className="space-y-2 font-sans text-xs">
+                <p className="text-slate-350"><strong className="text-white">KarmaScore:</strong> The reputation layer for builders.</p>
+                <p className="text-slate-350"><strong className="text-white">Karma Token:</strong> The decentralized economic utility layer.</p>
+                <p className="text-slate-350"><strong className="text-white">Karma Butterflies:</strong> The visual cultural identity layer.</p>
               </div>
             </div>
           </div>
 
           {/* Copyright, standard labels */}
-          <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-5 text-center text-slate-500 font-mono text-[10px] tracking-widest uppercase mt-4 border-t border-white/5">
-            <div className="space-y-1 text-left sm:text-center md:text-left">
+          <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-5 text-center text-slate-500 font-mono text-[9px] tracking-widest uppercase mt-4 border-t border-white/5">
+            <div className="space-y-1.5 text-center md:text-left">
               <span>© 2026 KARMA BUTTERFLIES. ALL RIGHTS RESERVED.</span>
               <p className="text-slate-400 text-[10px] tracking-normal font-sans normal-case">
                 {currentLang === 'es' && (
                   <>
-                    Un producto de <span className="text-slate-200 font-semibold">Vilora Labs</span> • Respaldado por{' '}
+                    Un producto de{' '}
+                    <a href="https://ViloraLabs.xyz" target="_blank" rel="noreferrer" className="text-slate-200 font-semibold hover:text-[#F59E0B] hover:underline transition-colors">
+                      Vilora Labs
+                    </a>{' '}
+                    • Respaldado por{' '}
                     <a href="https://karmascore.xyz" target="_blank" rel="noreferrer" className="text-[#F59E0B] font-bold hover:underline">
                       karmascore.xyz
                     </a>
@@ -415,7 +522,10 @@ export default function App() {
                 )}
                 {currentLang === 'zh' && (
                   <>
-                    <span className="text-slate-200 font-semibold">Vilora Labs</span> 出品 • 由{' '}
+                    <a href="https://ViloraLabs.xyz" target="_blank" rel="noreferrer" className="text-slate-200 font-semibold hover:text-[#F59E0B] hover:underline transition-colors">
+                      Vilora Labs
+                    </a>{' '}
+                    出品 • 由{' '}
                     <a href="https://karmascore.xyz" target="_blank" rel="noreferrer" className="text-[#F59E0B] font-bold hover:underline">
                       karmascore.xyz
                     </a>
@@ -424,7 +534,10 @@ export default function App() {
                 )}
                 {currentLang === 'ja' && (
                   <>
-                    <span className="text-slate-200 font-semibold">Vilora Labs</span> の製品 •{' '}
+                    <a href="https://ViloraLabs.xyz" target="_blank" rel="noreferrer" className="text-slate-200 font-semibold hover:text-[#F59E0B] hover:underline transition-colors">
+                      Vilora Labs
+                    </a>{' '}
+                    の製品 •{' '}
                     <a href="https://karmascore.xyz" target="_blank" rel="noreferrer" className="text-[#F59E0B] font-bold hover:underline">
                       karmascore.xyz
                     </a>
@@ -433,7 +546,11 @@ export default function App() {
                 )}
                 {currentLang === 'en' && (
                   <>
-                    A product from <span className="text-slate-200 font-semibold">Vilora Labs</span> • Backed by{' '}
+                    A product from{' '}
+                    <a href="https://ViloraLabs.xyz" target="_blank" rel="noreferrer" className="text-slate-200 font-semibold hover:text-[#F59E0B] hover:underline transition-colors">
+                      Vilora Labs
+                    </a>{' '}
+                    • Backed by{' '}
                     <a href="https://karmascore.xyz" target="_blank" rel="noreferrer" className="text-[#F59E0B] font-bold hover:underline">
                       karmascore.xyz
                     </a>
@@ -450,10 +567,10 @@ export default function App() {
               </p>
             </div>
             
-            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-slate-400 text-xs tracking-normal font-sans normal-case">
+            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-slate-400 text-xs tracking-normal font-sans normal-case shrink-0">
               {/* Interactive Language Selector */}
-              <div className="flex items-center gap-1 bg-[#121214] border border-white/5 rounded-xl px-2.5 py-1 text-[10px] font-sans font-bold">
-                <Globe className="w-3.5 h-3.5 text-[#F59E0B] mr-1 shrink-0" />
+              <div className="flex items-center gap-1 bg-[#09090B] border border-white/5 rounded-xl px-2.5 py-1 text-[10px] font-sans font-bold">
+                <Globe className="w-3.5 h-3.5 text-[#F59E0B] mr-1.5 shrink-0" />
                 <button
                   type="button"
                   onClick={() => handleLanguageChange('en')}
@@ -494,39 +611,12 @@ export default function App() {
                   JA
                 </button>
               </div>
-
-              <a 
-                href="https://x.com/i/communities/1989241165577613796" 
-                target="_blank" 
-                rel="noreferrer" 
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white transition border border-white/5"
-              >
-                <span className="text-[#F59E0B] font-extrabold">Foster Community</span>
-              </a>
-              
-              <a 
-                href="https://x.com/buzz_bver" 
-                target="_blank" 
-                rel="noreferrer" 
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-[#F59E0B] transition border border-[#F59E0B]/20"
-              >
-                <span>999BVERS: <strong className="text-white">@buzz_bver</strong></span>
-              </a>
-
-              <a 
-                href="https://x.com/karmaaiscore" 
-                target="_blank" 
-                rel="noreferrer" 
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-[#F59E0B] transition border border-[#F59E0B]/20"
-              >
-                <span>Karma AI: <strong className="text-white">@karmaaiscore</strong></span>
-              </a>
             </div>
           </div>
         </div>
       </footer>
 
-      {/* Narrative Story Modal */}
+      {/* What Inspired Me Popup Modal */}
       {isStoryOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-black/95 backdrop-blur-md flex items-center justify-center p-4">
           <div className="bg-[#090909] border border-white/10 rounded-3xl max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl p-6 sm:p-10 relative">
@@ -539,18 +629,18 @@ export default function App() {
               <X className="w-5 h-5" />
             </button>
 
-            {/* Story Header */}
+            {/* Inspiration Header */}
             <div className="mb-8 border-b border-white/5 pb-5">
               <span className="text-[10px] font-mono text-[#F59E0B] uppercase tracking-widest font-black block mb-2">
-                ORIGIN STORY
+                ORIGIN STORY & INSPIRATION
               </span>
-              <h2 className="text-2.5xl sm:text-3.5xl font-sans font-black text-white tracking-tight leading-tight">
-                The Story Behind Karma Butterflies
+              <h2 className="text-2.5xl sm:text-3xl font-display font-black text-white tracking-tight leading-tight">
+                What Inspired Karma Butterflies
               </h2>
             </div>
 
             {/* Story Content */}
-            <div className="space-y-6 text-sm sm:text-base leading-relaxed text-slate-305 font-sans tracking-wide">
+            <div className="space-y-6 text-sm sm:text-base leading-relaxed text-slate-300 font-sans tracking-wide">
               <p className="font-extrabold text-white text-lg">
                 Karma Butterflies wasn’t born from a marketing plan.
               </p>
@@ -567,7 +657,7 @@ export default function App() {
                 Like many people, I was carrying stress, pressure, and responsibilities while trying to build something meaningful. I reached a point where I felt exhausted from constantly asking for appreciation and understanding. Eventually, I stopped talking for a couple of days, hoping the silence would give me time to process everything.
               </p>
 
-              <p className="font-semibold text-slate-250">
+              <p className="font-semibold text-slate-300">
                 Instead, when I looked up, she was gone.
               </p>
 
@@ -577,6 +667,10 @@ export default function App() {
 
               <p>
                 At the time, I was already documenting parts of my journey inside my Telegram community through messages, videos, and conversations. The people there saw the struggle in real time. They saw the uncertainty, the disappointment, and the questions that followed.
+              </p>
+
+              <p>
+                As the community came together to support, encourage, and help each other, they showed me how adversity doesn't have to breed resentment. It can breed transformation.
               </p>
 
               <p className="font-bold text-white">
@@ -611,7 +705,7 @@ export default function App() {
                 Karma Butterflies is a reminder that every action matters. Every act of kindness creates a ripple. Every setback creates an opportunity to grow. Every person we meet leaves a mark on our journey.
               </p>
 
-              <p className="font-medium text-slate-250">
+              <p className="font-medium text-slate-300">
                 This project is dedicated to everyone who helped me keep moving forward when it would have been easier to quit.
               </p>
 
@@ -660,14 +754,14 @@ export default function App() {
                 {/* Share on X button */}
                 <a
                   href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
-                    "Discover the heartbeat and powerful origin story behind Karma Butterflies 🦋—Turning positive action into ecosystem reputation."
+                    "Discover what inspired Karma Butterflies 🦋—Turning positive action and community power into reputation."
                   )}&url=${encodeURIComponent(
                     typeof window !== "undefined" ? window.location.href : "https://karmabutterflies.com"
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-xs font-mono font-bold text-slate-300 hover:text-[#1DA1F2] flex items-center gap-1.5 transition cursor-pointer"
-                  title="Share on X (formerly Twitter)"
+                  title="Share on X"
                 >
                   <Twitter className="w-3.5 h-3.5 text-[#1DA1F2]" />
                   <span>Post to X</span>
@@ -676,9 +770,9 @@ export default function App() {
 
               <button 
                 onClick={() => setIsStoryOpen(false)}
-                className="w-full sm:w-auto px-6 py-2.5 bg-white text-black hover:bg-slate-200 transition font-sans font-bold text-xs uppercase tracking-wider rounded-xl cursor-pointer shadow-lg hover:scale-102"
+                className="w-full sm:w-auto px-6 py-2.5 bg-white text-black hover:bg-slate-250 transition font-sans font-bold text-xs uppercase tracking-wider rounded-xl cursor-pointer shadow-lg hover:scale-102"
               >
-                Close Story
+                Close
               </button>
             </div>
           </div>
@@ -862,7 +956,7 @@ export default function App() {
                 Scan First
               </button>
               <a
-                href="https://gravemint.io/"
+                href="https://gravemint.io/mint/FXSVHzLvVFey57U8ETuhHzrzDRT3FhvqzbxWpyoAJA4c"
                 target="_blank"
                 rel="noreferrer"
                 onClick={() => setShowPromo(false)}

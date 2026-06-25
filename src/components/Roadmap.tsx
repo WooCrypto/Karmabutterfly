@@ -99,7 +99,7 @@ export default function Roadmap() {
       status: 'in-progress',
       milestones: [
         'Interactive wallet trust rating tool (You can try it live on this page now!)',
-        'Official minting event for 2,000 unique Light and Shadow NFTs',
+        'Official minting event for 1,000 unique Light and Shadow NFTs',
         'Private group chat channels and update groups for early holders',
         'Early community voting panel to help direct our next steps'
       ]

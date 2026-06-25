@@ -42,5 +42,5 @@ export interface WalletAnalysis {
   };
   karmaLevel: number;
   butterflyId: string;
-  network?: 'EVM' | 'Solana' | 'Hedera';
+  network?: 'EVM' | 'Solana' | 'Hedera' | 'PulsePay';
 }

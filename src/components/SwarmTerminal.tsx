@@ -15,7 +15,6 @@ import {
 
 import WalletAnalyzer from './WalletAnalyzer';
 import ButterflyRegistry from './ButterflyRegistry';
-import ProfileOverlay from './ProfileOverlay';
 import BroadbandTreasury from './TreasuryPool';
 import UtilitySection from './UtilitySection';
 import Roadmap from './Roadmap';
@@ -207,7 +206,7 @@ export default function SwarmTerminal({ isLightMode }: SwarmTerminalProps) {
             <Award className="w-4 h-4 text-[#F59E0B]" />
             <div>
               <p className="text-slate-500 uppercase leading-none font-bold">GUARDS</p>
-              <p className="text-[#F59E0B] font-extrabold mt-0.5">999 UNIQUE BVERS</p>
+              <p className="text-[#F59E0B] font-extrabold mt-0.5">1000 UNIQUE BUTTERFLIES</p>
             </div>
           </div>
         </div>
@@ -301,11 +300,11 @@ export default function SwarmTerminal({ isLightMode }: SwarmTerminalProps) {
                       The Butterfly Collection & Avatar Suite
                     </h3>
                     <p className="text-slate-300 text-xs sm:text-sm font-semibold leading-relaxed">
-                      Unlock generative metadata combinations, inspect procedural seeds, and use the social media PFP Overlay Suite with dynamic layers. Set custom background frames to stand out on social media platforms.
+                      Unlock generative metadata combinations, inspect procedural seeds, and use the social media Add Floating X Badge Suite with dynamic layers. Set custom background frames to stand out on social media platforms.
                     </p>
                   </div>
                   <a
-                    href="https://gravemint.io/"
+                    href="https://gravemint.io/mint/FXSVHzLvVFey57U8ETuhHzrzDRT3FhvqzbxWpyoAJA4c"
                     target="_blank"
                     rel="noreferrer"
                     className="px-5 py-2.5 bg-rose-500 hover:bg-rose-400 text-white rounded-xl font-sans font-black text-[10px] tracking-wider uppercase transition shadow-lg shadow-rose-500/10 flex items-center gap-1.5 shrink-0"
@@ -316,10 +315,6 @@ export default function SwarmTerminal({ isLightMode }: SwarmTerminalProps) {
                 </div>
 
                 <ButterflyRegistry />
-                
-                <div id="profile-overlay" className="pt-6">
-                  <ProfileOverlay />
-                </div>
               </div>
             )}
 

@@ -42,9 +42,9 @@ export default function WalletAnalyzer() {
   ];
 
   const handleRandomAddress = () => {
-    // Generate a beautiful mock Ethereum hex, Solana base58, or Hedera 0.0.xxxxx address
+    // Generate a beautiful mock Ethereum hex, Solana base58, Hedera 0.0.xxxxx address, or PulsePay address
     const roll = Math.random();
-    if (roll < 0.33) {
+    if (roll < 0.25) {
       // Solana addresses look like base58 strings (32-44, let's do 44 chars)
       const base58Alphabet = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
       let mockAddr = '';
@@ -52,10 +52,18 @@ export default function WalletAnalyzer() {
         mockAddr += base58Alphabet[Math.floor(Math.random() * base58Alphabet.length)];
       }
       setAddress(mockAddr);
-    } else if (roll < 0.66) {
+    } else if (roll < 0.50) {
       // Hedera account address format (e.g., 0.0.485123)
       const mockHbarId = Math.floor(Math.random() * 9000000) + 100000;
       setAddress(`0.0.${mockHbarId}`);
+    } else if (roll < 0.75) {
+      // PulsePay address format (e.g., pulse_xxxxxx)
+      const hex = '0123456789abcdef';
+      let mockAddr = 'pulse_';
+      for (let i = 0; i < 32; i++) {
+        mockAddr += hex[Math.floor(Math.random() * 16)];
+      }
+      setAddress(mockAddr);
     } else {
       const hex = '0123456789abcdef';
       let mockAddr = '0x';
@@ -74,9 +82,10 @@ export default function WalletAnalyzer() {
     const isEvm = trimmed.startsWith('0x') && trimmed.length >= 10;
     const isSolana = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(trimmed);
     const isHedera = /^0\.0\.[0-9]+$/.test(trimmed);
+    const isPulsePay = trimmed.toLowerCase().startsWith('pulse') && trimmed.length >= 8;
 
-    if (!isEvm && !isSolana && !isHedera) {
-      alert('Please enter a valid EVM address (must start with 0x), Solana address, or Hedera address (e.g., 0.0.12345)');
+    if (!isEvm && !isSolana && !isHedera && !isPulsePay) {
+      alert('Please enter a valid EVM address (must start with 0x), Solana address, Hedera address (e.g., 0.0.12345), or PulsePay address.');
       return;
     }
 
@@ -157,7 +166,8 @@ export default function WalletAnalyzer() {
 
     const isEVM = addr.startsWith('0x');
     const isHedera = addr.startsWith('0.0.');
-    const network = isEVM ? 'EVM' : isHedera ? 'Hedera' : 'Solana';
+    const isPulsePay = addr.toLowerCase().startsWith('pulse');
+    const network = isEVM ? 'EVM' : isHedera ? 'Hedera' : isPulsePay ? 'PulsePay' : 'Solana';
 
     return {
       address: addr,
@@ -214,11 +224,11 @@ export default function WalletAnalyzer() {
                 className="max-w-xl mx-auto space-y-6 text-center"
               >
                 <div>
-                  <h3 className="text-2xl font-display font-black text-white tracking-tight">
-                    Reveal Your Reputation Wingbeat
+                  <h3 className="text-2xl font-display font-black text-white tracking-tight leading-snug">
+                    Reveal Your Reputation Wingbeat with Operation Wingbeat Powered by Karma AI
                   </h3>
-                  <p className="text-slate-450 text-xs sm:text-sm mt-2 max-w-md mx-auto leading-relaxed">
-                    Every transaction is a choice. Every smart contract interacted with or helper token sent transforms your digital karma alignment. Paste your EVM, Solana, or Hedera address below.
+                  <p className="text-slate-400 text-xs sm:text-sm mt-3 max-w-lg mx-auto leading-relaxed">
+                    Every transaction is a choice. Every smart contract interacted with or helper token sent transforms your digital karma alignment. You can paste your EVM wallets (Ethereum, Base, Arbitrum, BSC, Optimism, etc.), Solana, Hedera, or PulsePay Blockchain addresses below to scan your reputation.
                   </p>
                 </div>
 
@@ -227,7 +237,7 @@ export default function WalletAnalyzer() {
                     <input
                       type="text"
                       className="w-full px-4 py-4 pr-32 bg-[#050505] border border-white/10 hover:border-white/20 focus:border-[#F59E0B]/80 rounded-2xl text-white text-sm font-mono placeholder:text-slate-700 outline-none transition-all focus:ring-1 focus:ring-[#F59E0B]/30"
-                      placeholder="Enter EVM (0x...), Solana, or Hedera (0.0.x) Address"
+                      placeholder="Enter EVM, Solana, Hedera, or PulsePay Address"
                       value={address}
                       required
                       onChange={(e) => setAddress(e.target.value)}
@@ -339,6 +349,8 @@ export default function WalletAnalyzer() {
                           ? 'border-purple-500/30 bg-purple-950/20 text-purple-400' 
                           : analysis.network === 'Hedera'
                           ? 'border-emerald-500/30 bg-emerald-950/20 text-emerald-400'
+                          : analysis.network === 'PulsePay'
+                          ? 'border-rose-500/30 bg-rose-950/20 text-rose-400 animate-pulse'
                           : 'border-cyan-500/30 bg-cyan-950/20 text-cyan-400'
                       }`}>
                         {analysis.network || 'EVM'} Network
@@ -507,7 +519,7 @@ export default function WalletAnalyzer() {
                   {/* Actions footer */}
                   <div className="flex flex-col gap-3">
                     <a
-                      href="https://gravemint.io/"
+                      href="https://gravemint.io/mint/FXSVHzLvVFey57U8ETuhHzrzDRT3FhvqzbxWpyoAJA4c"
                       target="_blank"
                       rel="noreferrer"
                       className="w-full px-4 py-3.5 bg-gradient-to-r from-[#F59E0B] to-amber-400 hover:opacity-90 text-black rounded-xl text-xs font-sans font-black tracking-widest uppercase flex items-center justify-center gap-2 transition shadow-lg shadow-amber-500/10 text-center font-extrabold cursor-pointer"

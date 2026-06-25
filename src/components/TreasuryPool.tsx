@@ -93,19 +93,19 @@ export default function TreasuryPool() {
     alert(`Thank you for representing the swarm! Your community contribution of ${originalInput} USDT has been credited to the Community Vault to support ecosystem outreach and builder grants.`);
   };
 
-  // Perform estimation based on token tier (Light: ID <= 1000, Shadow: ID > 1000)
+  // Perform estimation based on token tier (Light: ID <= 500, Shadow: ID > 500)
   const handleCalculateEstimate = (e: React.FormEvent) => {
     e.preventDefault();
     const idNum = parseInt(estimateTokenId, 10);
-    if (isNaN(idNum) || idNum < 1 || idNum > 2000) {
-      alert('Please enter a valid Butterfly Token ID between 1 and 2000.');
+    if (isNaN(idNum) || idNum < 1 || idNum > 1000) {
+      alert('Please enter a valid Butterfly Token ID between 1 and 1000.');
       return;
     }
 
     // High Karma score yields larger share of the USDT pool
     // Deterministic calculations based on Token ID
     const baseScore = 50 + (idNum % 46);
-    const multiplier = idNum <= 1000 ? 2.5 : 2.1;
+    const multiplier = idNum <= 500 ? 2.5 : 2.1;
     const computedAmt = parseFloat((baseScore * multiplier).toFixed(2));
     
     setEstimatedReward(computedAmt);
@@ -343,7 +343,7 @@ export default function TreasuryPool() {
                     <input 
                       type="number"
                       min="1"
-                      max="2000"
+                      max="1000"
                       value={estimateTokenId}
                       onChange={(e) => setEstimateTokenId(e.target.value)}
                       placeholder="Token ID (e.g. 88)"

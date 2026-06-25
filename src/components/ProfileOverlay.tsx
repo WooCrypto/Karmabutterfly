@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, DragEvent, ChangeEvent, MouseEvent } from 'react';
+import React, { useState, useRef, useEffect, DragEvent, ChangeEvent, MouseEvent } from 'react';
 import SvgButterfly from './SvgButterfly';
 import { 
   Upload, 
@@ -18,7 +18,14 @@ import {
   Flame, 
   Info,
   Sliders,
-  ExternalLink
+  ExternalLink,
+  ZoomIn,
+  ZoomOut,
+  Move,
+  MousePointer,
+  Hand,
+  Plus,
+  Minus
 } from 'lucide-react';
 
 interface SavedOverlay {
@@ -40,6 +47,21 @@ export default function ProfileOverlay() {
   const [uploadedBaseImg, setUploadedBaseImg] = useState<string | null>(null);
   const [imgName, setImgName] = useState<string>('');
   const [imageRatio, setImageRatio] = useState<number>(1); // width / height
+  const [bgType, setBgType] = useState<'image' | 'transparent' | 'dark'>('transparent');
+  const [baseImgZoom, setBaseImgZoom] = useState<number>(1.0);
+  const [baseImgPanX, setBaseImgPanX] = useState<number>(0);
+  const [baseImgPanY, setBaseImgPanY] = useState<number>(0);
+
+  // High performance dynamic preview cache
+  const [compositeDataUrl, setCompositeDataUrl] = useState<string | null>(null);
+  const [editMode, setEditMode] = useState<'butterfly' | 'background'>('butterfly');
+
+  // Gesture state management
+  const [touchStartDist, setTouchStartDist] = useState<number | null>(null);
+  const [touchStartZoom, setTouchStartZoom] = useState<number>(1);
+  const [isPanning, setIsPanning] = useState<boolean>(false);
+  const [panStart, setPanStart] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [panStartOffset, setPanStartOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 
   // Overlay controller variables
   const [overlayScale, setOverlayScale] = useState<number>(20); // 10% to 60% of image width
@@ -168,6 +190,7 @@ export default function ProfileOverlay() {
     reader.onload = (e) => {
       const src = e.target?.result as string;
       setUploadedBaseImg(src);
+      setBgType('image');
 
       // Extract ratio
       const imgTemp = new Image();
@@ -209,17 +232,20 @@ export default function ProfileOverlay() {
 
   // Main high-resolution generation engine using Canvas
   const generateSocialComposition = async () => {
-    if (!uploadedBaseImg) return null;
     setIsGenerating(true);
 
     try {
-      // 1. Create a high-res off-screen image from uploaded picture
+      // 1. Load background if image mode is active and we have an image
+      const useBgImage = uploadedBaseImg && bgType === 'image';
       const baseImg = new Image();
-      await new Promise<void>((resolve, reject) => {
-        baseImg.onload = () => resolve();
-        baseImg.onerror = () => reject(new Error('Failed to load profile base image'));
-        baseImg.src = uploadedBaseImg;
-      });
+      
+      if (useBgImage && uploadedBaseImg) {
+        await new Promise<void>((resolve, reject) => {
+          baseImg.onload = () => resolve();
+          baseImg.onerror = () => reject(new Error('Failed to load profile base image'));
+          baseImg.src = uploadedBaseImg;
+        });
+      }
 
       // 2. Create offscreen SVG butterfly image
       const svgContainer = hiddenButterflyRef.current;
@@ -244,29 +270,49 @@ export default function ProfileOverlay() {
 
       // 3. Prepare high-resolution canvas
       const canvas = document.createElement('canvas');
-      canvas.width = baseImg.naturalWidth;
-      canvas.height = baseImg.naturalHeight;
+      canvas.width = useBgImage ? baseImg.naturalWidth : 500;
+      canvas.height = useBgImage ? baseImg.naturalHeight : 500;
       const ctx = canvas.getContext('2d');
       if (!ctx) throw new Error('Failed to acquire 2D canvas context');
 
       // 4. Draw profile background
-      ctx.drawImage(baseImg, 0, 0, canvas.width, canvas.height);
+      if (useBgImage) {
+        ctx.save();
+        const zoom = baseImgZoom;
+        const panX = (baseImgPanX / 100) * canvas.width;
+        const panY = (baseImgPanY / 100) * canvas.height;
 
-      // Apply key out background effect if requested
-      if (keyOutBackground) {
-        // Simple canvas chroma key filter to make white backgrounds of the uploaded image transparent
-        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const data = imgData.data;
-        for (let i = 0; i < data.length; i += 4) {
-          const r = data[i];
-          const g = data[i+1];
-          const b = data[i+2];
-          // If close to absolute white, make it transparent
-          if (r > 240 && g > 240 && b > 240) {
-            data[i+3] = 0; // zero alpha
+        const w = canvas.width * zoom;
+        const h = canvas.height * zoom;
+        const x = (canvas.width - w) / 2 + panX;
+        const y = (canvas.height - h) / 2 + panY;
+
+        ctx.drawImage(baseImg, x, y, w, h);
+        ctx.restore();
+
+        // Apply key out background effect if requested
+        if (keyOutBackground) {
+          // Simple canvas chroma key filter to make white backgrounds of the uploaded image transparent
+          const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const data = imgData.data;
+          for (let i = 0; i < data.length; i += 4) {
+            const r = data[i];
+            const g = data[i+1];
+            const b = data[i+2];
+            // If close to absolute white, make it transparent
+            if (r > 240 && g > 240 && b > 240) {
+              data[i+3] = 0; // zero alpha
+            }
           }
+          ctx.putImageData(imgData, 0, 0);
         }
-        ctx.putImageData(imgData, 0, 0);
+      } else if (bgType === 'dark') {
+        // Draw solid dark background
+        ctx.fillStyle = '#070708';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      } else {
+        // Transparent background
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
       }
 
       // 5. Draw transparent SvgButterfly with positioning, rotation, and glows
@@ -366,6 +412,163 @@ export default function ProfileOverlay() {
       return null;
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  // Effect to dynamically compile the high-fidelity merged composition image
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      try {
+        const dataUrl = await generateSocialComposition();
+        if (dataUrl) {
+          setCompositeDataUrl(dataUrl);
+        }
+      } catch (err) {
+        console.error("Auto composition compilation failed", err);
+      }
+    }, 250);
+
+    return () => clearTimeout(timer);
+  }, [
+    uploadedBaseImg,
+    bgType,
+    overlayScale,
+    offsetX,
+    offsetY,
+    rotation,
+    glowSize,
+    glowColor,
+    enableGlow,
+    keyOutBackground,
+    selectedBadge,
+    detectedAlignment,
+    detectedSeed,
+    isEvolved,
+    baseImgZoom,
+    baseImgPanX,
+    baseImgPanY
+  ]);
+
+  // Gestures and interactions
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (e.touches.length === 2) {
+      // Pinch gesture
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      setTouchStartDist(dist);
+      setTouchStartZoom(editMode === 'butterfly' ? overlayScale : baseImgZoom);
+    } else if (e.touches.length === 1) {
+      // Pan gesture
+      setIsPanning(true);
+      setPanStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+      if (editMode === 'butterfly') {
+        setPanStartOffset({ x: offsetX, y: offsetY });
+      } else {
+        setPanStartOffset({ x: baseImgPanX, y: baseImgPanY });
+      }
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (e.touches.length === 2 && touchStartDist !== null) {
+      e.preventDefault();
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      const factor = dist / touchStartDist;
+      if (editMode === 'butterfly') {
+        // Scale butterfly size (range: 5% to 100%)
+        const newScale = Math.min(100, Math.max(5, Math.round(touchStartZoom * factor)));
+        setOverlayScale(newScale);
+      } else {
+        // Scale background zoom (range: 1.0 to 4.0)
+        const newZoom = Math.min(4.0, Math.max(1.0, parseFloat((touchStartZoom * factor).toFixed(2))));
+        setBaseImgZoom(newZoom);
+      }
+    } else if (e.touches.length === 1 && isPanning) {
+      e.preventDefault();
+      const dx = e.touches[0].clientX - panStart.x;
+      const dy = e.touches[0].clientY - panStart.y;
+
+      const containerWidth = containerRef.current?.clientWidth || 400;
+      const containerHeight = containerRef.current?.clientHeight || 400;
+
+      const pctX = (dx / containerWidth) * 100;
+      const pctY = (dy / containerHeight) * 100;
+
+      if (editMode === 'butterfly') {
+        // Drag butterfly
+        const newOffsetX = Math.min(110, Math.max(-50, Math.round(panStartOffset.x - pctX)));
+        const newOffsetY = Math.min(110, Math.max(-50, Math.round(panStartOffset.y + pctY)));
+        setOffsetX(newOffsetX);
+        setOffsetY(newOffsetY);
+      } else {
+        // Drag background image
+        const newPanX = Math.min(200, Math.max(-200, Math.round(panStartOffset.x + pctX)));
+        const newPanY = Math.min(200, Math.max(-200, Math.round(panStartOffset.y + pctY)));
+        setBaseImgPanX(newPanX);
+        setBaseImgPanY(newPanY);
+      }
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setTouchStartDist(null);
+    setIsPanning(false);
+  };
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.button !== 0) return;
+    setIsPanning(true);
+    setPanStart({ x: e.clientX, y: e.clientY });
+    if (editMode === 'butterfly') {
+      setPanStartOffset({ x: offsetX, y: offsetY });
+    } else {
+      setPanStartOffset({ x: baseImgPanX, y: baseImgPanY });
+    }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isPanning) return;
+    e.preventDefault();
+    const dx = e.clientX - panStart.x;
+    const dy = e.clientY - panStart.y;
+
+    const containerWidth = containerRef.current?.clientWidth || 400;
+    const containerHeight = containerRef.current?.clientHeight || 400;
+
+    const pctX = (dx / containerWidth) * 100;
+    const pctY = (dy / containerHeight) * 100;
+
+    if (editMode === 'butterfly') {
+      const newOffsetX = Math.min(110, Math.max(-50, Math.round(panStartOffset.x - pctX)));
+      const newOffsetY = Math.min(110, Math.max(-50, Math.round(panStartOffset.y + pctY)));
+      setOffsetX(newOffsetX);
+      setOffsetY(newOffsetY);
+    } else {
+      const newPanX = Math.min(200, Math.max(-200, Math.round(panStartOffset.x + pctX)));
+      const newPanY = Math.min(200, Math.max(-200, Math.round(panStartOffset.y + pctY)));
+      setBaseImgPanX(newPanX);
+      setBaseImgPanY(newPanY);
+    }
+  };
+
+  const handleMouseUpOrLeave = () => {
+    setIsPanning(false);
+  };
+
+  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const zoomFactor = e.deltaY < 0 ? 1.05 : 0.95;
+    if (editMode === 'butterfly') {
+      const newScale = Math.min(100, Math.max(5, Math.round(overlayScale * zoomFactor)));
+      setOverlayScale(newScale);
+    } else {
+      const newZoom = Math.min(4.0, Math.max(1.0, parseFloat((baseImgZoom * zoomFactor).toFixed(2))));
+      setBaseImgZoom(newZoom);
     }
   };
 
@@ -497,10 +700,10 @@ export default function ProfileOverlay() {
               <span>Identity Customization Suite</span>
             </span>
             <h2 className="text-3xl sm:text-4xl font-sans font-black text-white tracking-tight">
-              Butterfly Profile Overlay
+              Add Floating X Badge
             </h2>
             <p className="text-slate-400 text-sm mt-3 leading-relaxed max-w-xl">
-              Let your karma fly with you everywhere. This utility superimposes your custom high-fidelity generative Karma Butterfly onto your profile picture or favorite digital canvas instantly showing ownership.
+              Let your karma fly with you everywhere. This utility superimposes your custom high-fidelity generative Karma Butterfly onto your profile picture or favorite digital canvas instantly showing ownership. Add Floating X Badge suite allows seamless badging on the go!
             </p>
           </div>
 
@@ -514,7 +717,7 @@ export default function ProfileOverlay() {
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              Overlay Generator
+              Add Floating X Badge Generator
             </button>
             <button
               onClick={() => setActiveTab('library')}
@@ -753,74 +956,227 @@ export default function ProfileOverlay() {
 
                 {/* Control Sliders */}
                 <div className="space-y-4 pt-1">
-                  {/* Size slider */}
-                  <div className="space-y-1.5">
-                    <div className="flex justify-between text-[10.5px] font-mono">
-                      <span className="text-slate-400 uppercase">BUTTERFLY SIZE</span>
-                      <span className="text-white font-bold">{overlayScale}%</span>
+                  {/* Edit Target Selector */}
+                  <div className="space-y-2 border-b border-white/5 pb-3">
+                    <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">INTERACTION TARGET</span>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <button
+                        onClick={() => setEditMode('butterfly')}
+                        className={`py-2 px-3 rounded-xl border font-sans font-extrabold uppercase tracking-wider transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                          editMode === 'butterfly'
+                            ? 'bg-[#F59E0B]/10 border-[#F59E0B]/50 text-[#F59E0B]'
+                            : 'bg-black/20 border-white/5 text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        <Move className="w-3.5 h-3.5 shrink-0" />
+                        <span>🦋 Butterfly</span>
+                      </button>
+                      <button
+                        onClick={() => setEditMode('background')}
+                        className={`py-2 px-3 rounded-xl border font-sans font-extrabold uppercase tracking-wider transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                          editMode === 'background'
+                            ? 'bg-[#F59E0B]/10 border-[#F59E0B]/50 text-[#F59E0B]'
+                            : 'bg-black/20 border-white/5 text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        <Hand className="w-3.5 h-3.5 shrink-0" />
+                        <span>🖼️ Background</span>
+                      </button>
                     </div>
-                    <input
-                      type="range"
-                      min="10"
-                      max="60"
-                      value={overlayScale}
-                      onChange={(e) => setOverlayScale(parseInt(e.target.value))}
-                      className="w-full accent-[#F59E0B] cursor-pointer h-1 bg-[#1A1A1A] rounded-lg"
-                    />
+                    <p className="text-[9.5px] font-mono text-slate-500 text-center leading-normal">
+                      💡 Pro-Tip: You can drag, scroll (wheel), or pinch directly on the canvas to move/resize the selected layer!
+                    </p>
                   </div>
 
-                  {/* Horizontal Margin */}
-                  <div className="space-y-1.5">
-                    <div className="flex justify-between text-[10.5px] font-mono">
-                      <span className="text-slate-400 uppercase">RIGHT EDGE MARGIN (X)</span>
-                      <span className="text-white font-bold">{offsetX}%</span>
+                  {/* Canvas Background Style selection */}
+                  <div className="space-y-2 border-b border-white/5 pb-3">
+                    <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">CANVAS BACKGROUND BASE</span>
+                    <div className="grid grid-cols-3 gap-2 text-[10px] uppercase font-bold">
+                      <button
+                        onClick={() => setBgType('transparent')}
+                        className={`py-1.5 px-2 rounded-lg border text-center transition cursor-pointer ${
+                          bgType === 'transparent'
+                            ? 'bg-neutral-800 border-white/30 text-white'
+                            : 'bg-black/20 border-white/5 text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        🏁 Transparent
+                      </button>
+                      <button
+                        onClick={() => setBgType('dark')}
+                        className={`py-1.5 px-2 rounded-lg border text-center transition cursor-pointer ${
+                          bgType === 'dark'
+                            ? 'bg-neutral-800 border-white/30 text-white'
+                            : 'bg-black/20 border-white/5 text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        ◼️ Deep Slate
+                      </button>
+                      <button
+                        disabled={!uploadedBaseImg}
+                        onClick={() => setBgType('image')}
+                        className={`py-1.5 px-2 rounded-lg border text-center transition disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer ${
+                          bgType === 'image'
+                            ? 'bg-neutral-800 border-white/30 text-white'
+                            : 'bg-black/20 border-white/5 text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        🖼️ Photo Base
+                      </button>
                     </div>
-                    <input
-                      type="range"
-                      min="0"
-                      max="40"
-                      value={offsetX}
-                      onChange={(e) => setOffsetX(parseInt(e.target.value))}
-                      className="w-full accent-[#F59E0B] cursor-pointer h-1 bg-[#1A1A1A] rounded-lg"
-                    />
                   </div>
 
-                  {/* Vertical Margin */}
-                  <div className="space-y-1.5">
-                    <div className="flex justify-between text-[10.5px] font-mono">
-                      <span className="text-slate-400 uppercase">TOP EDGE MARGIN (Y)</span>
-                      <span className="text-white font-bold">{offsetY}%</span>
-                    </div>
-                    <input
-                      type="range"
-                      min="0"
-                      max="40"
-                      value={offsetY}
-                      onChange={(e) => setOffsetY(parseInt(e.target.value))}
-                      className="w-full accent-[#F59E0B] cursor-pointer h-1 bg-[#1A1A1A] rounded-lg"
-                    />
-                  </div>
+                  {editMode === 'butterfly' ? (
+                    <div className="space-y-4">
+                      {/* Size slider */}
+                      <div className="space-y-1.5">
+                        <div className="flex justify-between text-[10.5px] font-mono">
+                          <span className="text-slate-400 uppercase">BUTTERFLY SIZE</span>
+                          <span className="text-white font-bold">{overlayScale}%</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button 
+                            onClick={() => setOverlayScale(Math.max(5, overlayScale - 5))}
+                            className="p-1 px-2.5 rounded bg-neutral-900 border border-white/5 text-slate-350 hover:text-white text-xs font-mono font-bold cursor-pointer"
+                          >
+                            -
+                          </button>
+                          <input
+                            type="range"
+                            min="5"
+                            max="100"
+                            value={overlayScale}
+                            onChange={(e) => setOverlayScale(parseInt(e.target.value))}
+                            className="flex-1 accent-[#F59E0B] cursor-pointer h-1 bg-[#1A1A1A] rounded-lg"
+                          />
+                          <button 
+                            onClick={() => setOverlayScale(Math.min(100, overlayScale + 5))}
+                            className="p-1 px-2.5 rounded bg-neutral-900 border border-white/5 text-slate-350 hover:text-white text-xs font-mono font-bold cursor-pointer"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
 
-                  {/* Rotation */}
-                  <div className="space-y-1.5">
-                    <div className="flex justify-between text-[10.5px] font-mono">
-                      <span className="text-slate-400 uppercase">WING TILT (ROTATION)</span>
-                      <span className="text-white font-bold">{rotation}°</span>
+                      {/* Horizontal Margin */}
+                      <div className="space-y-1.5">
+                        <div className="flex justify-between text-[10.5px] font-mono">
+                          <span className="text-slate-400 uppercase">HORIZONTAL OFFSET (X)</span>
+                          <span className="text-white font-bold">{offsetX}%</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="-20"
+                          max="90"
+                          value={offsetX}
+                          onChange={(e) => setOffsetX(parseInt(e.target.value))}
+                          className="w-full accent-[#F59E0B] cursor-pointer h-1 bg-[#1A1A1A] rounded-lg"
+                        />
+                      </div>
+
+                      {/* Vertical Margin */}
+                      <div className="space-y-1.5">
+                        <div className="flex justify-between text-[10.5px] font-mono">
+                          <span className="text-slate-400 uppercase">VERTICAL OFFSET (Y)</span>
+                          <span className="text-white font-bold">{offsetY}%</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="-20"
+                          max="90"
+                          value={offsetY}
+                          onChange={(e) => setOffsetY(parseInt(e.target.value))}
+                          className="w-full accent-[#F59E0B] cursor-pointer h-1 bg-[#1A1A1A] rounded-lg"
+                        />
+                      </div>
+
+                      {/* Rotation */}
+                      <div className="space-y-1.5">
+                        <div className="flex justify-between text-[10.5px] font-mono">
+                          <span className="text-slate-400 uppercase">WING TILT (ROTATION)</span>
+                          <span className="text-white font-bold">{rotation}°</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="-180"
+                          max="180"
+                          value={rotation}
+                          onChange={(e) => setRotation(parseInt(e.target.value))}
+                          className="w-full accent-[#F59E0B] cursor-pointer h-1 bg-[#1A1A1A] rounded-lg"
+                        />
+                      </div>
                     </div>
-                    <input
-                      type="range"
-                      min="-180"
-                      max="180"
-                      value={rotation}
-                      onChange={(e) => setRotation(parseInt(e.target.value))}
-                      className="w-full accent-[#F59E0B] cursor-pointer h-1 bg-[#1A1A1A] rounded-lg"
-                    />
-                  </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {/* Zoom background */}
+                      <div className="space-y-1.5">
+                        <div className="flex justify-between text-[10.5px] font-mono">
+                          <span className="text-slate-400 uppercase">PHOTO ZOOM</span>
+                          <span className="text-white font-bold">{baseImgZoom.toFixed(1)}x</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button 
+                            onClick={() => setBaseImgZoom(Math.max(1.0, parseFloat((baseImgZoom - 0.1).toFixed(2))))}
+                            className="p-1 px-2.5 rounded bg-neutral-900 border border-white/5 text-slate-350 hover:text-white text-xs font-mono font-bold cursor-pointer"
+                          >
+                            -
+                          </button>
+                          <input
+                            type="range"
+                            min="1.0"
+                            max="4.0"
+                            step="0.05"
+                            value={baseImgZoom}
+                            onChange={(e) => setBaseImgZoom(parseFloat(e.target.value))}
+                            className="flex-1 accent-[#F59E0B] cursor-pointer h-1 bg-[#1A1A1A] rounded-lg"
+                          />
+                          <button 
+                            onClick={() => setBaseImgZoom(Math.min(4.0, parseFloat((baseImgZoom + 0.1).toFixed(2))))}
+                            className="p-1 px-2.5 rounded bg-neutral-900 border border-white/5 text-slate-350 hover:text-white text-xs font-mono font-bold cursor-pointer"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Pan X */}
+                      <div className="space-y-1.5">
+                        <div className="flex justify-between text-[10.5px] font-mono">
+                          <span className="text-slate-400 uppercase">PHOTO SHIFT X (PAN)</span>
+                          <span className="text-white font-bold">{baseImgPanX}%</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="-200"
+                          max="200"
+                          value={baseImgPanX}
+                          onChange={(e) => setBaseImgPanX(parseInt(e.target.value))}
+                          className="w-full accent-[#F59E0B] cursor-pointer h-1 bg-[#1A1A1A] rounded-lg"
+                        />
+                      </div>
+
+                      {/* Pan Y */}
+                      <div className="space-y-1.5">
+                        <div className="flex justify-between text-[10.5px] font-mono">
+                          <span className="text-slate-400 uppercase">PHOTO SHIFT Y (PAN)</span>
+                          <span className="text-white font-bold">{baseImgPanY}%</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="-200"
+                          max="200"
+                          value={baseImgPanY}
+                          onChange={(e) => setBaseImgPanY(parseInt(e.target.value))}
+                          className="w-full accent-[#F59E0B] cursor-pointer h-1 bg-[#1A1A1A] rounded-lg"
+                        />
+                      </div>
+                    </div>
+                  )}
 
                   {/* Optional Glow controller */}
                   <div className="pt-2 border-t border-white/5 space-y-2.5">
                     <div className="flex items-center justify-between">
-                      <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                      <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5 cursor-pointer">
                         <input
                           type="checkbox"
                           checked={enableGlow}
@@ -940,23 +1296,64 @@ export default function ProfileOverlay() {
                 {/* Main Composition Canvas Preview Box */}
                 <div 
                   ref={containerRef}
-                  className="relative w-full max-w-[340px] md:max-w-[400px] aspect-square rounded-2xl bg-[#070708] border-2 border-dashed border-white/10 flex items-center justify-center p-3 overflow-hidden shadow-inner"
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={handleMouseMove}
+                  onMouseUp={handleMouseUpOrLeave}
+                  onMouseLeave={handleMouseUpOrLeave}
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                  onWheel={handleWheel}
+                  className={`relative w-full max-w-[340px] md:max-w-[400px] aspect-square rounded-2xl border-2 border-dashed border-white/10 flex items-center justify-center overflow-hidden shadow-inner transition-all select-none ${
+                    bgType === 'transparent'
+                      ? 'bg-[linear-gradient(45deg,#161617_25%,transparent_25%),linear-gradient(-45deg,#161617_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#161617_75%),linear-gradient(-45deg,transparent_75%,#161617_75%)] bg-[size:16px_16px] bg-[position:0_0,0_8px,8px_-8px,-8px_0] bg-[#070708]'
+                      : bgType === 'dark'
+                      ? 'bg-[#0B0B0C]'
+                      : 'bg-[#070708]'
+                  }`}
                 >
-                  {uploadedBaseImg ? (
+                  {bgType === 'image' && !uploadedBaseImg ? (
+                    <div className="text-center p-8 space-y-4">
+                      <div className="w-16 h-16 rounded-2xl bg-amber-500/5 border border-[#F59E0B]/20 flex items-center justify-center text-4xl mx-auto animate-bounce duration-1000">
+                        📸
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs text-white font-black uppercase tracking-widest">No Base Image Selected</p>
+                        <p className="text-[11px] text-slate-500 leading-relaxed max-w-[240px] mx-auto">
+                          Attach your profile photo to begin layering, or switch canvas background to Transparent / Deep Slate above.
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => fileInputRef.current?.click()}
+                        className="py-1.5 px-3 bg-[#F59E0B] hover:bg-amber-400 text-black rounded-lg text-[10px] uppercase font-mono tracking-widest font-extrabold cursor-pointer"
+                      >
+                        Browse Photo ↗
+                      </button>
+                    </div>
+                  ) : (
                     <div className="relative w-full h-full flex items-center justify-center overflow-hidden rounded-xl">
                       
                       {/* Base Image */}
-                      <img 
-                        src={uploadedBaseImg} 
-                        alt="Workspace Base" 
-                        className={`w-full h-full object-cover rounded-xl transition ${
-                          keyOutBackground ? 'bg-slate-900 shadow-xl' : ''
-                        }`} 
-                      />
+                      {bgType === 'image' && uploadedBaseImg && (
+                        <div 
+                          className="w-full h-full transition-transform duration-75 pointer-events-none"
+                          style={{
+                            transform: `scale(${baseImgZoom}) translate(${baseImgPanX}%, ${baseImgPanY}%)`,
+                          }}
+                        >
+                          <img 
+                            src={uploadedBaseImg} 
+                            alt="Workspace Base" 
+                            className={`w-full h-full object-cover rounded-xl ${
+                              keyOutBackground ? 'bg-slate-900 shadow-xl' : ''
+                            }`} 
+                          />
+                        </div>
+                      )}
 
                       {/* Floating Vector Butterfly Overlay */}
                       <div 
-                        className="absolute cursor-move select-none"
+                        className="absolute cursor-move select-none active:scale-[1.02] transition-transform"
                         style={{
                           top: `${offsetY}%`,
                           right: `${offsetX}%`,
@@ -964,7 +1361,7 @@ export default function ProfileOverlay() {
                           height: `${overlayScale}%`,
                           transform: `rotate(${rotation}deg)`,
                           filter: enableGlow ? `drop-shadow(0 0 ${glowSize}px ${glowColor})` : 'none',
-                          transition: 'filter 0.3s ease'
+                          transition: 'filter 0.3s ease, width 0.1s ease, height 0.1s ease'
                         }}
                       >
                         <div className="w-full h-full">
@@ -981,7 +1378,7 @@ export default function ProfileOverlay() {
 
                       {/* Brand Pill badge overlay */}
                       {selectedBadge !== 'none' && (
-                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/95 text-white border border-[#F59E0B] px-3.5 py-1.5 rounded-full text-[9px] sm:text-[10px] font-sans font-black uppercase tracking-wider shadow-lg flex items-center gap-1 animate-pulse-glow">
+                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/95 text-white border border-[#F59E0B] px-3.5 py-1.5 rounded-full text-[9px] sm:text-[10px] font-sans font-black uppercase tracking-wider shadow-lg flex items-center gap-1 animate-pulse-glow z-10">
                           <BadgeCheck className="w-3 h-3 text-[#F59E0B] shrink-0" />
                           <span>
                             {selectedBadge === 'holder' && 'Karma Butterfly Holder'}
@@ -990,24 +1387,22 @@ export default function ProfileOverlay() {
                           </span>
                         </div>
                       )}
-                    </div>
-                  ) : (
-                    <div className="text-center p-8 space-y-4">
-                      <div className="w-16 h-16 rounded-2xl bg-amber-500/5 border border-[#F59E0B]/20 flex items-center justify-center text-4xl mx-auto animate-bounce duration-1000">
-                        🦋
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-xs text-white font-black uppercase tracking-widest">Awaiting Profile Capture</p>
-                        <p className="text-[11px] text-slate-500 leading-relaxed max-w-[240px] mx-auto">
-                          Attach or Drag in your Twitter (X) avatar, any NFT portrait, or device photo to begin layering.
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => fileInputRef.current?.click()}
-                        className="py-1.5 px-3 bg-[#F59E0B] hover:bg-amber-400 text-black rounded-lg text-[10px] uppercase font-mono tracking-widest font-extrabold cursor-pointer"
-                      >
-                        Browse Folder ↗
-                      </button>
+
+                      {/* Tap to save composite hover-overlay */}
+                      {compositeDataUrl && !isPanning && (
+                        <div 
+                          onClick={handleDownload}
+                          className="absolute inset-0 w-full h-full cursor-pointer z-20 group"
+                          title="Tap/Click to save composite"
+                        >
+                          {/* We can overlay a subtle interactive ring or tooltip on hover */}
+                          <div className="absolute inset-0 bg-amber-500/0 hover:bg-amber-500/5 transition-all flex items-center justify-center">
+                            <div className="opacity-0 group-hover:opacity-100 bg-black/90 border border-[#F59E0B]/50 px-3 py-1.5 rounded-lg text-[9px] font-mono text-[#F59E0B] tracking-wider uppercase shadow-xl transition-all scale-95 group-hover:scale-100">
+                              📲 Tap / Click to download
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -1016,7 +1411,7 @@ export default function ProfileOverlay() {
                 <div className="w-full mt-6 space-y-3 pt-4 border-t border-white/5">
                   <div className="flex flex-col sm:flex-row gap-3 w-full">
                     <button
-                      disabled={!uploadedBaseImg || isGenerating}
+                      disabled={isGenerating || (bgType === 'image' && !uploadedBaseImg)}
                       onClick={handleDownload}
                       className="flex-1 py-3 bg-[#F59E0B] disabled:bg-amber-500/10 disabled:text-slate-500 disabled:cursor-not-allowed text-black rounded-xl text-xs font-sans font-black uppercase tracking-widest flex items-center justify-center gap-1.5 hover:scale-[1.01] transition-all cursor-pointer shadow-lg shadow-amber-500/10 font-extrabold"
                     >
@@ -1028,13 +1423,13 @@ export default function ProfileOverlay() {
                       ) : (
                         <>
                           <Download className="w-3.5 h-3.5" />
-                          <span>Add My Butterfly</span>
+                          <span>Download Creation</span>
                         </>
                       )}
                     </button>
                   </div>
 
-                  {uploadedBaseImg && (
+                  {(uploadedBaseImg || bgType !== 'image') && (
                     <div className="space-y-2">
                       <span className="text-[8.5px] font-mono text-slate-500 uppercase tracking-widest block text-center">Export Custom Platform Crop Size presets:</span>
                       <div className="grid grid-cols-4 gap-2 text-center text-[9px] font-mono text-slate-300">
@@ -1122,14 +1517,14 @@ export default function ProfileOverlay() {
                 <div>
                   <h4 className="text-white font-bold text-sm tracking-tight uppercase">Creations Ledger Empty</h4>
                   <p className="text-xs text-slate-500 leading-relaxed max-w-sm mx-auto mt-1">
-                    Your generated and saved profile overlays will show up here. Open the Generator to compose your first image preset!
+                    Your generated and saved profile badges will show up here. Open the Generator to compose your first image preset!
                   </p>
                 </div>
                 <button
                   onClick={() => setActiveTab('editor')}
                   className="py-1.5 px-4 bg-transparent border border-white/10 hover:border-amber-500/30 text-white rounded-lg text-[10px] uppercase font-mono tracking-wider cursor-pointer"
                 >
-                  Generate Overlay Now
+                  Generate Badge Now
                 </button>
               </div>
             )}

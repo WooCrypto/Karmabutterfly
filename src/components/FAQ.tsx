@@ -35,6 +35,16 @@ export default function FAQ({ isNested = false }: FAQProps) {
       id: 'faq-5',
       question: 'What concrete rewards do Karma Butterfly holders receive?',
       answer: 'Holders unlock high-reputation trust badges, exclusive premium access inside our Alpha coordinate networks, voting privileges in the safety database registry, and direct treasury perks. Additionally, our voluntary charity channel operates to clean up the workspace—assisting victims of exploits, funding decentralized education, and building browser guardrails to root out security vulnerabilities.'
+    },
+    {
+      id: 'faq-6',
+      question: 'What is Karma Gamez and how do I earn real SOL?',
+      answer: 'Karma Gamez (karmagamez.xyz) is our zero-risk, zero-commitment daily reward and staking portal. The mechanic is simple: Visit once a day ➔ Claim free tokens ➔ Stake them ➔ Earn real SOL. You do NOT need any money, there is ZERO financial risk, and you can try it instantly.'
+    },
+    {
+      id: 'faq-7',
+      question: 'Do I need a Karma Butterfly NFT to earn on Karma Gamez?',
+      answer: 'No! If you do not own a Karma Butterfly NFT, you can still play and earn standard daily tokens. However, the NFT acts as a powerful earnings accelerator—NFT holders earn significantly faster with a built-in multiplier boost.'
     }
   ];
 

@@ -29,7 +29,7 @@ const hashString = (str: string) => {
 
 // Generates complete metadata traits for a specific token ID
 export const getButterflyMetadata = (id: number) => {
-  const isLight = id <= 1000;
+  const isLight = id <= 500;
   const seed = `karma-butterfly-${id}`;
   const h = hashString(seed);
   
@@ -77,6 +77,29 @@ export const getButterflyMetadata = (id: number) => {
   };
 };
 
+// Generates standard OpenSea/ERC-721 compatible metadata for smart contracts
+export const getStandardERC721Metadata = (id: number) => {
+  const meta = getButterflyMetadata(id);
+  return {
+    name: meta.name,
+    description: `Karma Butterflies are a collection of 1,000 unique generative digital vectors representing on-chain trust, reputation, and builder credentials. Butterfly #${id} belongs to the ${meta.alignment} alignment.`,
+    image: `ipfs://__REPLACE_WITH_YOUR_IMAGES_CID__/${id}.svg`,
+    external_url: `https://karmascore.io/registry/${id}`,
+    attributes: [
+      { trait_type: "Alignment", value: meta.alignment },
+      { trait_type: "Collection", value: meta.collection },
+      { trait_type: "Rarity", value: meta.rarity },
+      { trait_type: "Archetype", value: meta.archetype },
+      { trait_type: "Wing Curvature", value: meta.traits['Wing Curvature'] },
+      { trait_type: "Wing Expansion", value: meta.traits['Wing Expansion'] },
+      { trait_type: "Internal Circuit", value: meta.traits['Internal Circuit'] },
+      { trait_type: "Chamber Frequency", value: meta.traits['Chamber Frequency'] },
+      { trait_type: "Resonance Level", display_type: "number", value: meta.traits['Resonance Level'] },
+      { trait_type: "Cybernetic Rank", value: meta.traits['Cybernetic Rank'] }
+    ]
+  };
+};
+
 export default function ButterflyRegistry() {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState<'all' | 'light' | 'shadow'>('all');
@@ -107,7 +130,7 @@ export default function ButterflyRegistry() {
   }, [evolvedIds]);
 
   // ZIP generation states
-  const [zippingCollection, setZippingCollection] = useState<'light' | 'shadow' | null>(null);
+  const [zippingCollection, setZippingCollection] = useState<'light' | 'shadow' | 'full' | null>(null);
   const [zipProgress, setZipProgress] = useState(0);
   const [zipStatusText, setZipStatusText] = useState('');
   
@@ -119,7 +142,7 @@ export default function ButterflyRegistry() {
 
   // Load more trigger
   const handleLoadMore = () => {
-    setVisibleCount(prev => Math.min(prev + 24, 2000));
+    setVisibleCount(prev => Math.min(prev + 24, 1000));
   };
 
   const handleEvolveTrigger = (id: number) => {
@@ -166,7 +189,7 @@ export default function ButterflyRegistry() {
   // Generate lists
   const allButterflies = useMemo(() => {
     const arr = [];
-    for (let i = 1; i <= 2000; i++) {
+    for (let i = 1; i <= 1000; i++) {
       arr.push(i);
     }
     return arr;
@@ -177,9 +200,9 @@ export default function ButterflyRegistry() {
 
     // Filter by Tab (Light vs Shadow)
     if (activeTab === 'light') {
-      result = result.filter(id => id <= 1000);
+      result = result.filter(id => id <= 500);
     } else if (activeTab === 'shadow') {
-      result = result.filter(id => id > 1000);
+      result = result.filter(id => id > 500);
     }
 
     // Filter by Search Term
@@ -398,13 +421,14 @@ export default function ButterflyRegistry() {
 
   // Handles single download of metadata JSON
   const handleSingleDownloadJson = () => {
-    if (!selectedMetadata) return;
-    const dataStr = JSON.stringify(selectedMetadata, null, 2);
+    if (!selectedId) return;
+    const stdMeta = getStandardERC721Metadata(selectedId);
+    const dataStr = JSON.stringify(stdMeta, null, 2);
     const blob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `karma-butterfly-${selectedId}-metadata.json`;
+    a.download = `${selectedId}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -412,119 +436,56 @@ export default function ButterflyRegistry() {
   };
 
   // BULK ZIP PACKAGING ENGINE (Optimized)
-  const compileBulkZip = async (type: 'light' | 'shadow') => {
+  const compileBulkZip = async (type: 'light' | 'shadow' | 'full') => {
     if (zippingCollection !== null) return;
     
     setZippingCollection(type);
     setZipProgress(1);
     setZipStatusText('Initializing JSZip compiler...');
 
-    // 1000 items is a heavy task to convert to PNG all in one frame.
-    // Instead, we bundle all 1000 SVGs (text, instant) and 1000 Metadata JSONs (text, instant),
-    // and provide PNG assets for 20 unique high-res featured assets plus instructions on how to generate the rest offline.
-    // Wait! Let's generate a highly functional zip file!
-    // It will contain:
-    // 1. "svgs/" folder with ALL 1000 vector files (extremely high fidelity, printable, ERC-721 preferred format).
-    // 2. "metadata/" folder with ALL 1000 individual NFT-compatible standard ERC-721 JSON files.
-    // 3. "featured_pngs/" folder with fully rendered PNGs of the top 30 legendary and rare assets.
-    // 4. "collection_manifest.json" combining all traits for easy relational sorting.
-    // 5. "Readme.txt" explaining the seed algorithm and github directory replication.
+    // To ensure perfect compatibility with OpenSea, Thirdweb, and IPFS uploaders:
+    // We package exactly matching directories:
+    // 1. "images/" containing only standard token SVG files ([id].svg)
+    // 2. "metadata/" containing only standard token ERC-721 JSON files ([id].json)
+    // We avoid writing any extra files (such as index manifests, Readme files, or additional formats)
+    // inside the ZIP so the uploader registers exactly the requested number of tokens (e.g. exactly 1000 for the full package) with zero mismatches.
     
     try {
       const zip = new JSZip();
-      const startId = type === 'light' ? 1 : 1001;
-      const endId = type === 'light' ? 1000 : 2000;
+      const startId = type === 'light' ? 1 : (type === 'shadow' ? 501 : 1);
+      const endId = type === 'light' ? 500 : (type === 'shadow' ? 1000 : 1000);
       
-      const svgsFolder = zip.folder('svgs');
+      const imagesFolder = zip.folder('images');
       const metaFolder = zip.folder('metadata');
-      const pngsFolder = zip.folder('featured_pngs');
       
-      const combinedMetadata: any[] = [];
-
       // Step 1: Pack SVGs and Metadata JSON files (very fast)
       setZipStatusText('Compiling vector SVGs and JSON metadata packets...');
       await new Promise(resolve => setTimeout(resolve, 300));
       
       for (let i = startId; i <= endId; i++) {
-        const meta = getButterflyMetadata(i);
-        combinedMetadata.push(meta);
+        const stdMeta = getStandardERC721Metadata(i);
 
-        // Add SVG file
+        // Add SVG file named exactly [id].svg inside images/
         const svgStr = getSvgStringForToken(i);
-        if (svgsFolder) {
-          svgsFolder.file(`karma_butterfly_${i}.svg`, svgStr);
+        if (imagesFolder) {
+          imagesFolder.file(`${i}.svg`, svgStr);
         }
 
-        // Add Metadata JSON file
+        // Add Metadata JSON file named exactly [id].json inside metadata/
         if (metaFolder) {
-          metaFolder.file(`karma_butterfly_${i}.json`, JSON.stringify(meta, null, 2));
+          metaFolder.file(`${i}.json`, JSON.stringify(stdMeta, null, 2));
         }
 
         // Periodically yield thread to prevent browser UI freezing
-        if (i % 150 === 0) {
-          const pct = Math.round(((i - startId) / (endId - startId)) * 40);
+        if (i % 100 === 0 || i === endId) {
+          const pct = Math.round(((i - startId + 1) / (endId - startId + 1)) * 85);
           setZipProgress(pct);
-          setZipStatusText(`Packaging artifacts: ${i - startId + 1}/${endId - startId + 1} vector modules...`);
-          await new Promise(resolve => setTimeout(resolve, 50));
+          setZipStatusText(`Packaging artifacts: ${i - startId + 1}/${endId - startId + 1} matching modules...`);
+          await new Promise(resolve => setTimeout(resolve, 35));
         }
       }
 
-      // Step 2: Render selected featured high-res PNG files (e.g. 15 stunning legendary/epic ones)
-      setZipProgress(45);
-      setZipStatusText('Generating high-res PNG feature assets via browser Canvas...');
-      await new Promise(resolve => setTimeout(resolve, 200));
-
-      const featuredIds: number[] = [];
-      // Pick 15 deterministic interesting keys to export as PNG in the zip
-      for (let i = startId; i <= endId; i += 65) {
-        featuredIds.push(i);
-      }
-      
-      for (let idx = 0; idx < featuredIds.length; idx++) {
-        const fid = featuredIds[idx];
-        const svgStr = getSvgStringForToken(fid);
-        try {
-          const pngBlob = await drawSvgToCanvas(svgStr);
-          if (pngsFolder) {
-            pngsFolder.file(`featured_karma_butterfly_${fid}.png`, pngBlob);
-          }
-        } catch (e) {
-          console.warn(`Skipped PNG generation for #${fid}`, e);
-        }
-        
-        const pct = 45 + Math.round((idx / featuredIds.length) * 35);
-        setZipProgress(pct);
-        setZipStatusText(`Rendering high-res featured PNG #${fid} (${idx + 1}/${featuredIds.length})...`);
-        await new Promise(resolve => setTimeout(resolve, 60));
-      }
-
-      // Step 3: Write index files
-      setZipProgress(82);
-      setZipStatusText('Assembling global catalog index and repository guidelines...');
-      await new Promise(resolve => setTimeout(resolve, 150));
-
-      zip.file('catalog_manifest.json', JSON.stringify(combinedMetadata, null, 2));
-      zip.file('Readme.txt', `========================================================================
-KARMA BUTTERFLIES METADATA & ARTIFACT CATALOG
-========================================================================
-Collection: ${type === 'light' ? 'LIGHT COLLECTION (The Builders & Mentors)' : 'SHADOW COLLECTION (The Sentinels & Survivors)'}
-Token IDs: #${startId} to #${endId}
-Form Factor: ERC-721 Non-Fungible Tokens compliant metadata catalog.
-
-Structure:
-- /svgs/............ Complete 1000 1-to-1 high fidelity vector graphics.
-- /metadata/........ Complete 1000 ERC-721 individual trait JSON schemas.
-- /featured_pngs/... Selected rendered high-resolution PNGs (1000x1000 pixels).
-- catalog_manifest.json... Global catalog with pre-indexed attributes for fast querying.
-
-GENESIS SEED REPLICATION ALGORITHM:
-All attributes are derived deterministically using salt-seeded cryptographic hashing
-of \`karma-butterfly-{ID}\`. The exact parameters can be rebuilt on-chain on any compatible
-EVM runner or Web3 swarm engine.
-
-Generated via standard client-side browser bundle using JSZIP 2026.`);
-
-      // Step 4: Compress and download as Blob
+      // Step 2: Compress and download as Blob
       setZipProgress(90);
       setZipStatusText('Compressing collection folder into ZIP archive... (This may take a few seconds)');
       await new Promise(resolve => setTimeout(resolve, 100));
@@ -569,105 +530,12 @@ Generated via standard client-side browser bundle using JSZIP 2026.`);
             The Digital Stamp Ledger
           </span>
           <h2 className="text-3xl sm:text-5xl font-sans font-black text-white tracking-tight">
-            The 2,000 Butterfly Registry
+            The 1,000 Butterfly Registry
           </h2>
           <p className="text-slate-400 text-sm mt-3 leading-relaxed">
-            The entire on-chain alignment database is completely mapped. Use the interactive scroll viewer to explore all 1,000 Light and 1,000 Shadow butterflies, or compile a complete high-res asset ZIP archive with matching custom traits metadata.
+            The entire on-chain alignment database is completely mapped. Use the interactive scroll viewer to explore all 500 Light and 500 Shadow butterflies.
           </p>
         </div>
-
-        {/* BULK EXPORTER HERO BOX */}
-        <div className="mb-12 bg-gradient-to-br from-[#1A1A1A] to-[#0D0D0D] border border-white/10 rounded-2xl p-6 sm:p-8 flex flex-col lg:flex-row items-center justify-between gap-8 relative overflow-hidden">
-          <div className="absolute -top-16 -right-16 w-44 h-44 bg-[#F59E0B]/10 rounded-full blur-2xl pointer-events-none" />
-          
-          <div className="space-y-3 max-w-2xl">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-orange-950/20 border border-[#F59E0B]/20 text-[10px] font-mono font-bold text-[#F59E0B] uppercase">
-              <Sparkles className="w-3 h-3 animate-pulse" />
-              On-Chain Data Exporter
-            </div>
-            <h3 className="text-lg sm:text-xl font-sans font-black text-white">
-              Download Complete High-Res Collections (SVG, Metadata & Selected PNG)
-            </h3>
-            <p className="text-slate-400 text-xs leading-relaxed">
-              Generate and download the entire 1,000-piece collection bundles as structured ZIP archives. Each ZIP contains individual ERC-721 standard metadata logs, scalable vector blueprints, and select pre-rendered PNG graphics ready for IPFS upload.
-            </p>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto shrink-0">
-            {/* Download Light Collection */}
-            <button
-              onClick={() => compileBulkZip('light')}
-              disabled={zippingCollection !== null}
-              className={`px-5 py-3 rounded-xl font-mono text-xs uppercase tracking-wider font-extrabold flex items-center justify-center gap-2.5 transition border ${
-                zippingCollection === 'light'
-                  ? 'bg-amber-950/20 border-[#F59E0B] text-[#F59E0B]'
-                  : 'bg-black hover:bg-neutral-900 border-white/10 hover:border-[#F59E0B] text-[#F59E0B] cursor-pointer'
-              }`}
-            >
-              {zippingCollection === 'light' ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin text-[#F59E0B]" />
-                  <span>Packing Light...</span>
-                </>
-              ) : (
-                <>
-                  <Download className="w-4 h-4" />
-                  <span>Get Light Collection ZIP</span>
-                </>
-              )}
-            </button>
-
-            {/* Download Shadow Collection */}
-            <button
-              onClick={() => compileBulkZip('shadow')}
-              disabled={zippingCollection !== null}
-              className={`px-5 py-3 rounded-xl font-mono text-xs uppercase tracking-wider font-extrabold flex items-center justify-center gap-2.5 transition border ${
-                zippingCollection === 'shadow'
-                  ? 'bg-purple-950/20 border-purple-500 text-purple-400'
-                  : 'bg-black hover:bg-neutral-900 border-white/10 hover:border-purple-500 text-purple-400 cursor-pointer'
-              }`}
-            >
-              {zippingCollection === 'shadow' ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin text-purple-400" />
-                  <span>Packing Shadow...</span>
-                </>
-              ) : (
-                <>
-                  <Download className="w-4 h-4" />
-                  <span>Get Shadow Collection ZIP</span>
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-
-        {/* Packing Progress Status Panel */}
-        {zippingCollection && (
-          <div className="mb-10 p-5 rounded-xl border border-white/10 bg-black/60 flex flex-col md:flex-row md:items-center justify-between gap-4 animate-pulse-glow">
-            <div className="space-y-1.5 flex-grow">
-              <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest block font-bold">
-                Compilation Progress
-              </span>
-              <p className="text-xs text-white font-mono flex items-center gap-1.5">
-                <Loader2 className="w-3.5 h-3.5 text-[#F59E0B] animate-spin" />
-                {zipStatusText}
-              </p>
-            </div>
-            
-            <div className="flex items-center gap-3 md:w-80 whitespace-nowrap shrink-0">
-              <div className="w-full bg-[#111] h-2 rounded-full overflow-hidden border border-white/5 relative">
-                <div 
-                  className={`h-full transition-all duration-300 ${
-                    zippingCollection === 'light' ? 'bg-[#F59E0B]' : 'bg-purple-500'
-                  }`}
-                  style={{ width: `${zipProgress}%` }}
-                />
-              </div>
-              <span className="text-xs font-mono font-bold text-slate-300">{zipProgress}%</span>
-            </div>
-          </div>
-        )}
 
         {/* REGISTRY VIEWER LAYOUT GRID */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
@@ -702,7 +570,7 @@ Generated via standard client-side browser bundle using JSZIP 2026.`);
                         : 'text-slate-400 hover:text-white'
                     }`}
                   >
-                    All (2,000)
+                    All (1,000)
                   </button>
                   <button
                     onClick={() => setActiveTab('light')}
@@ -712,7 +580,7 @@ Generated via standard client-side browser bundle using JSZIP 2026.`);
                         : 'text-slate-400 hover:text-white'
                     }`}
                   >
-                    Light (1K)
+                    Light (500)
                   </button>
                   <button
                     onClick={() => setActiveTab('shadow')}
@@ -722,7 +590,7 @@ Generated via standard client-side browser bundle using JSZIP 2026.`);
                         : 'text-slate-400 hover:text-white'
                     }`}
                   >
-                    Shadow (1K)
+                    Shadow (500)
                   </button>
                 </div>
               </div>
@@ -885,7 +753,7 @@ Generated via standard client-side browser bundle using JSZIP 2026.`);
                 <Info className="w-3.5 h-3.5 text-[#F59E0B]" />
                 Use search input prefix 'Rare' or ID numbers to jump segments
               </span>
-              <span>Loaded 2,000 Verified Vectors</span>
+              <span>Loaded 1,000 Verified Vectors</span>
             </div>
 
           </div>
@@ -1058,14 +926,14 @@ Generated via standard client-side browser bundle using JSZIP 2026.`);
                           {/* Top right token indicator box */}
                           <div className="border border-[#F59E0B]/30 bg-amber-950/10 px-2.5 py-0.5 rounded text-right flex flex-col justify-center font-mono select-none">
                             <span className="text-slate-500 text-[6.5px] uppercase tracking-widest leading-none block mb-0.5">Butterfly</span>
-                            <span className="text-[#F59E0B] font-extrabold text-[10px] leading-none">#{selectedMetadata.id + 2000}</span>
+                            <span className="text-[#F59E0B] font-extrabold text-[10px] leading-none">#{selectedMetadata.id + 1000}</span>
                           </div>
                         </div>
 
                         {/* Decoded id and upgraded stamp */}
                         <div className="flex items-center justify-between border-b border-purple-950/40 pb-2.5 mb-2 relative z-10">
                           <span className="text-[9px] text-[#a855f7]/80 uppercase tracking-widest font-black">
-                            DECODED ID: Butterfly #{selectedMetadata.id + 2000}
+                            DECODED ID: Butterfly #{selectedMetadata.id + 1000}
                           </span>
                           
                           {/* diagonaled layout badge */}
@@ -1198,7 +1066,7 @@ Generated via standard client-side browser bundle using JSZIP 2026.`);
                               Evolved Metamorphosis Locked
                             </h3>
                             <p className="text-slate-400 text-xs leading-relaxed font-sans font-medium">
-                              The Evolved collection consists of <strong className="text-slate-200">2,000 unique dragon-wing transmutations</strong>. The upgrade process will open for all Genesis holders after the 1st collection has been fully minted on-chain.
+                              The Evolved collection consists of <strong className="text-slate-200">1,000 unique dragon-wing transmutations</strong>. The upgrade process will open for all Genesis holders after the 1st collection has been fully minted on-chain.
                             </p>
                             <p className="text-slate-400 text-xs leading-relaxed font-sans font-medium">
                               You can simulate and preview the entire metamorphosis process here to see #{selectedMetadata.id}'s potential evolved form!
@@ -1217,7 +1085,7 @@ Generated via standard client-side browser bundle using JSZIP 2026.`);
                           </button>
 
                           <a
-                            href="https://gravemint.io/"
+                            href="https://gravemint.io/mint/FXSVHzLvVFey57U8ETuhHzrzDRT3FhvqzbxWpyoAJA4c"
                             target="_blank"
                             rel="noreferrer"
                             className="w-full py-3 bg-gradient-to-r from-teal-950 to-emerald-950/25 hover:from-teal-900 border border-emerald-500/30 text-emerald-300 hover:text-emerald-100 font-sans font-extrabold text-[11px] uppercase tracking-wider text-center rounded-xl flex items-center justify-center gap-1.5 transition cursor-pointer"

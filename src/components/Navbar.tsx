@@ -60,14 +60,22 @@ export default function Navbar({ onScanClick, isLightMode, onThemeToggle }: Navb
     setMobileMenuOpen(false);
   };
 
-  const menuItems = [
-    { label: 'Narrative', href: '#narrative' },
-    { label: 'Duality', href: '#duality' },
-    { label: 'Registry', href: '#registry' },
-    { label: 'PFP Overlay', href: '#profile-overlay' },
+  interface MenuItem {
+    label: string;
+    href: string;
+    external?: boolean;
+    highlight?: boolean;
+  }
+
+  const menuItems: MenuItem[] = [
+    { label: 'Inspiration', href: '#inspiration' },
+    { label: 'Scanner', href: '#analyzer' },
+    { label: 'NFT Hub', href: '#registry' },
+    { label: 'Staking 🪙', href: '#staking', highlight: true },
+    { label: 'Gamez 🎮', href: 'https://karmagamez.xyz', external: true },
     { label: 'Treasury', href: '#treasury' },
-    { label: 'Karma Gamez 🎮', href: 'https://karmagamez.xyz', external: true },
-    { label: 'Utility', href: '#utility' },
+    { label: 'Creed', href: '#creed' },
+    { label: 'Guardians', href: '#guardians' },
   ];
 
   return (
@@ -102,10 +110,17 @@ export default function Navbar({ onScanClick, isLightMode, onThemeToggle }: Navb
               <a
                 key={item.label}
                 href={item.href}
+                onClick={(e) => {
+                  if (item.href === '#inspiration') {
+                    window.dispatchEvent(new CustomEvent('open-inspiration-story'));
+                  }
+                }}
                 target={item.external ? '_blank' : undefined}
                 rel={item.external ? 'noopener noreferrer' : undefined}
                 className={
-                  item.external 
+                  item.highlight
+                    ? 'text-emerald-400 hover:text-emerald-300 hover:scale-105 font-sans font-black text-xs tracking-wider uppercase transition-all flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-lg animate-pulse shadow-md shadow-emerald-500/5'
+                    : item.external 
                     ? 'text-amber-400 hover:text-[#F59E0B] hover:scale-105 font-sans font-black text-xs tracking-wider uppercase transition-all flex items-center gap-1 bg-amber-500/10 border border-amber-500/20 px-2 py-1 rounded-lg' 
                     : 'text-slate-300 hover:text-[#F59E0B] font-sans font-medium text-xs tracking-wider uppercase transition-colors'
                 }
@@ -301,7 +316,7 @@ export default function Navbar({ onScanClick, isLightMode, onThemeToggle }: Navb
             </button>
 
             <a
-              href="https://gravemint.io/"
+              href="https://gravemint.io/mint/FXSVHzLvVFey57U8ETuhHzrzDRT3FhvqzbxWpyoAJA4c"
               target="_blank"
               rel="noreferrer"
               className="px-4 py-2 bg-[#F59E0B] text-black hover:bg-amber-400 rounded-xl font-sans font-black text-xs tracking-wider uppercase transition shadow-md hover:scale-102 flex items-center justify-center cursor-pointer font-extrabold"
@@ -326,7 +341,7 @@ export default function Navbar({ onScanClick, isLightMode, onThemeToggle }: Navb
               Scan
             </button>
             <a
-              href="https://gravemint.io/"
+              href="https://gravemint.io/mint/FXSVHzLvVFey57U8ETuhHzrzDRT3FhvqzbxWpyoAJA4c"
               target="_blank"
               rel="noreferrer"
               className="px-2.5 py-1.5 rounded-lg bg-white text-black text-[10px] font-black uppercase tracking-wider font-extrabold flex items-center justify-center"
@@ -350,11 +365,18 @@ export default function Navbar({ onScanClick, isLightMode, onThemeToggle }: Navb
             <a
               key={item.label}
               href={item.href}
-              onClick={() => setMobileMenuOpen(false)}
+              onClick={() => {
+                setMobileMenuOpen(false);
+                if (item.href === '#inspiration') {
+                  window.dispatchEvent(new CustomEvent('open-inspiration-story'));
+                }
+              }}
               target={item.external ? '_blank' : undefined}
               rel={item.external ? 'noopener noreferrer' : undefined}
               className={
-                item.external
+                item.highlight
+                  ? 'block py-2 pb-2.5 text-emerald-400 hover:text-emerald-300 font-sans font-black text-xs tracking-widest uppercase border-b border-white/5 animate-pulse'
+                  : item.external
                   ? 'block py-2 pb-2.5 text-amber-400 hover:text-[#F59E0B] font-sans font-black text-xs tracking-widest uppercase border-b border-white/5 animate-pulse'
                   : 'block py-2 text-slate-300 hover:text-[#F59E0B] font-sans font-medium text-xs tracking-widest uppercase border-b border-white/5'
               }
@@ -441,7 +463,7 @@ export default function Navbar({ onScanClick, isLightMode, onThemeToggle }: Navb
               Scan Wallet
             </button>
             <a
-              href="https://gravemint.io/"
+              href="https://gravemint.io/mint/FXSVHzLvVFey57U8ETuhHzrzDRT3FhvqzbxWpyoAJA4c"
               target="_blank"
               rel="noreferrer"
               onClick={() => setMobileMenuOpen(false)}
